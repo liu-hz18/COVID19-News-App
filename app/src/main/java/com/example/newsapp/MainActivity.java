@@ -6,15 +6,18 @@ import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 
-import org.jetbrains.annotations.NotNull;
+import  org.jetbrains.annotations.Contract;
+import  org.jetbrains.annotations.NotNull;
 import  com.alibaba.fastjson.JSON;
 import  com.alibaba.fastjson.annotation.JSONField;
 import  com.alibaba.fastjson.JSONObject;
+
 import  java.io.IOException;
 import  java.io.BufferedReader;
 import  java.io.InputStreamReader;
 import  java.net.URL;
 
+import java.util.ArrayList;
 import  java.util.Objects;
 import  java.util.stream.Collectors;
 import  java.util.Arrays;
@@ -35,10 +38,9 @@ class Converter {
     }
 
     @NotNull
-    public static Integer NullToInt(@NotNull String numberlike) {
+    private static Integer NullToInt(@NotNull String numberlike) {
         return numberlike.equals("null") ? 0 : Integer.parseInt(numberlike);
     }
-
 }
 
 
@@ -70,6 +72,31 @@ class EpidemicData {
     public EpidemicData(final String begin, @NotNull final List<Integer> data) {
         this(begin, data.get(0), data.get(1), data.get(2), data.get(3));
     }
+
+    @Contract(pure = true)
+    public final int getDead() {
+        return this.mDead;
+    }
+
+    @Contract(pure = true)
+    public final int getConfirmed() {
+        return this.mConfirmed;
+    }
+
+    @Contract(pure = true)
+    public final int getSuspected() {
+        return this.mSuspected;
+    }
+
+    @Contract(pure = true)
+    public final int getCured() {
+        return this.mCured;
+    }
+
+    @Contract(pure = true)
+    public final String getBeginDate() {  //format: "YYYY-MM-DD"
+        return this.mBegin;
+    }
 }
 
 class CountryEpidemicData extends EpidemicData {
@@ -99,12 +126,9 @@ class ProvinceEpidemicData extends EpidemicData {
     @JSONField(name = "Province")
     private String mProvince;
 
+    @Contract(pure = true)
     public final String getProvince() {
         return mProvince;
-    }
-
-    public ProvinceEpidemicData() {
-        super("", 0, 0, 0, 0);
     }
 
     public ProvinceEpidemicData(final String province, final String begin, final int confirmed, final int suspected, final int cured, final int dead) {
@@ -116,6 +140,39 @@ class ProvinceEpidemicData extends EpidemicData {
         this(province, begin, numbers.get(0), numbers.get(1), numbers.get(2), numbers.get(3));
     }
 }
+
+
+class NewsEntity {
+    private static String url_prefix = "https://covid-dashboard-api.aminer.cn/event/";
+    private String mEventId;
+    private String mType;
+    private String mTitle;
+    private String mCatagory;
+    private String mTime;
+    private String mLang;
+    private String mContent;
+    private List<String> mRelatedNews = new ArrayList<>();
+
+    public NewsEntity(final String id, final String type, final String title, final String catagory,
+                      final String time, final String lang) {
+        this.mEventId = id;
+        this.mCatagory = catagory;
+        this.mTitle = title;
+        this.mTime = time;
+        this.mLang = lang;
+        this.mType = type;
+        this.readContent();
+    }
+
+    private void readContent() {
+        try{
+            JSONObject json_obj = BaseDataParser.getJsonData(url_prefix + this.mEventId);
+        } catch (IOException e) {
+            this.mContent = "NULL";
+        }
+    }
+}
+
 
 class BaseDataParser {
 
@@ -171,6 +228,7 @@ class EventsDataParser extends BaseDataParser {
     public static JSONObject getJsonData() throws IOException {
         return BaseDataParser.getJsonData(url);
     }
+    public static
 }
 
 class SearchEntityDataParser extends BaseDataParser {
