@@ -4,12 +4,10 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
-
 import org.jetbrains.annotations.NotNull;
 import  com.alibaba.fastjson.JSON;
 import  com.alibaba.fastjson.annotation.JSONField;
 import  com.alibaba.fastjson.JSONObject;
-
 import  java.io.IOException;
 import  java.io.BufferedReader;
 import  java.io.InputStreamReader;
