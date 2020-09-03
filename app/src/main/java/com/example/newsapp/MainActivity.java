@@ -1,9 +1,11 @@
 package com.example.newsapp;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
+
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
+
 import org.jetbrains.annotations.NotNull;
 import  com.alibaba.fastjson.JSON;
 import  com.alibaba.fastjson.annotation.JSONField;
@@ -32,7 +34,8 @@ class Converter {
                 .collect(Collectors.toList());
     }
 
-    public static Integer NullToInt(String numberlike) {
+    @NotNull
+    public static Integer NullToInt(@NotNull String numberlike) {
         return numberlike.equals("null") ? 0 : Integer.parseInt(numberlike);
     }
 
@@ -80,7 +83,7 @@ class CountryEpidemicData extends EpidemicData {
         this.mCountry = country;
     }
 
-    public CountryEpidemicData(final String province, final String begin, final List<Integer> numbers) {
+    public CountryEpidemicData(final String province, final String begin, @NotNull final List<Integer> numbers) {
         this(province, begin, numbers.get(0), numbers.get(1), numbers.get(2), numbers.get(3));
     }
 
@@ -109,7 +112,7 @@ class ProvinceEpidemicData extends EpidemicData {
         this.mProvince = province;
     }
 
-    public ProvinceEpidemicData(final String province, final String begin, final List<Integer> numbers) {
+    public ProvinceEpidemicData(final String province, final String begin, @NotNull final List<Integer> numbers) {
         this(province, begin, numbers.get(0), numbers.get(1), numbers.get(2), numbers.get(3));
     }
 }
@@ -136,6 +139,7 @@ class EpidemicDataParser extends BaseDataParser {
     protected static JSONObject getJsonData() throws IOException {
         return BaseDataParser.getJsonData(url);
     }
+    @NotNull
     public static Map<String, CountryEpidemicData> jsonToList() throws IOException {
         JSONObject json_obj = getJsonData();
         Map<String, CountryEpidemicData> edataset = new HashMap<>();
@@ -194,15 +198,12 @@ public class MainActivity extends AppCompatActivity {
         netThread.start();
     }
 
-    Runnable networkTask = new Runnable() {
-        @Override
-        public void run() {
-            try {
-                Map<String, CountryEpidemicData> temp = EpidemicDataParser.jsonToList();
-                Log.d("Main", temp.toString());
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+    Runnable networkTask = () -> {
+        try {
+            Map<String, CountryEpidemicData> temp = EpidemicDataParser.jsonToList();
+            Log.d("Main", temp.toString());
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     };
 }
