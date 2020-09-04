@@ -16,6 +16,7 @@ import java.util.Map;
 class BaseEntity { }
 
 class EpidemicEntity extends BaseEntity {
+    private static final String TAG = "EpidemicEntity";
     @JSONField(name = "begin")
     private String mBegin;
 
@@ -71,6 +72,7 @@ class EpidemicEntity extends BaseEntity {
 }
 
 class CountryEpidemicEntity extends EpidemicEntity {
+    private static final String TAG = "CountryEpidemicEntity";
     @JSONField(name = "country")
     private String mCountry;
 
@@ -94,6 +96,7 @@ class CountryEpidemicEntity extends EpidemicEntity {
 }
 
 class ProvinceEpidemicEntity extends EpidemicEntity {
+    private static final String TAG = "ProvinceEpidemicEntity";
     @JSONField(name = "Province")
     private String mProvince;
 
@@ -113,6 +116,7 @@ class ProvinceEpidemicEntity extends EpidemicEntity {
 }
 
 class NewsEntity extends BaseEntity {
+    private static final String TAG = "NewsEntity";
     private static String url_prefix = "https://covid-dashboard-api.aminer.cn/event/";
     private String mEventId;
     private String mType;
@@ -171,6 +175,7 @@ class NewsEntity extends BaseEntity {
 }
 
 class RelationEntity extends BaseEntity {
+    private static final String TAG = "RelationEntity";
     private String mRelation;
     private String mRelationURL;
     private String mLabel;
@@ -190,6 +195,7 @@ class RelationEntity extends BaseEntity {
 }
 
 class SearchEntity extends BaseEntity {
+    private static final String TAG = "SearchEntity";
     private Double mHotRate;
     private String mLabel;
     private String mURL;
@@ -235,6 +241,7 @@ class SearchEntity extends BaseEntity {
 }
 
 class ExpertEntity extends BaseEntity {
+    private static final String TAG = "ExpertEntity";
     public String mImgURL;       //照片链接
     private String mId;           //唯一标识
     public String mZhName;       //中文名

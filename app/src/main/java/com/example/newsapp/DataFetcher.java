@@ -18,7 +18,7 @@ import java.util.Objects;
 
 
 class BaseDataFetcher {
-
+    private static final String TAG = "BaseDataFetcher";
     static JSONObject getJsonData(final String url_str) throws IOException {
         URL data_url = new URL(url_str);
         BufferedReader json_in = new BufferedReader(new InputStreamReader(data_url.openStream()));
@@ -33,6 +33,7 @@ class BaseDataFetcher {
 }
 
 class EpidemicDataFetcher extends BaseDataFetcher {
+    private static final String TAG = "EpidemicDataFetcher";
     private final static String url = "https://covid-dashboard.aminer.cn/api/dist/epidemic.json";
     private static JSONObject getJsonData() throws IOException {
         return BaseDataFetcher.getJsonData(url);
@@ -65,6 +66,7 @@ class EpidemicDataFetcher extends BaseDataFetcher {
 
 
 class EventsDataFetcher extends BaseDataFetcher {
+    private static final String TAG = "EventsDataFetcher";
     private final static String url = "https://covid-dashboard.aminer.cn/api/dist/events.json";
     private static JSONObject getJsonData() throws IOException {
         return BaseDataFetcher.getJsonData(url);
@@ -96,6 +98,7 @@ class EventsDataFetcher extends BaseDataFetcher {
 }
 
 class SearchEntityDataFetcher extends BaseDataFetcher {
+    private static final String TAG = "SearchEntityDataFetcher";
     private final static String url = "https://innovaapi.aminer.cn/covid/api/v1/pneumonia/entityquery?entity=";
 
     public static JSONObject getJsonData(final String keyword) throws IOException {
@@ -135,6 +138,7 @@ class SearchEntityDataFetcher extends BaseDataFetcher {
 }
 
 class ExpertsDataFetcher extends BaseDataFetcher {
+    private static final String TAG = "ExpertsDataFetcher";
     private final static String url = "https://innovaapi.aminer.cn/predictor/api/v1/valhalla/highlight/get_ncov_expers_list?v=2";
 
     private static JSONObject getJsonData() throws IOException {
