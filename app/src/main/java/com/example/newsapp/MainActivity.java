@@ -4,11 +4,13 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Build;
 import android.os.Bundle;
+import android.util.JsonReader;
 import android.util.Log;
 
 import  org.jetbrains.annotations.Contract;
 import  org.jetbrains.annotations.NotNull;
 import  com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import  com.alibaba.fastjson.annotation.JSONField;
 import  com.alibaba.fastjson.JSONObject;
 
@@ -17,6 +19,7 @@ import  java.io.BufferedReader;
 import  java.io.InputStreamReader;
 import  java.net.URL;
 
+import java.security.acl.LastOwnerException;
 import java.util.ArrayList;
 import  java.util.Objects;
 import  java.util.stream.Collectors;
@@ -28,10 +31,10 @@ import  java.util.List;
 
 class Converter {
     @RequiresApi(api = Build.VERSION_CODES.N)
-    public static List<Integer> StringToList(@NotNull String listString, final String splitKey, final int topk) {
+    public static List<Integer> StringListToList(@NotNull String listString, final String splitKey, final int topk) {
         String str = listString.toString().replace("[","").replace("]","");
         List<String> numbers = Arrays.asList(Arrays.copyOf(str.split(splitKey), topk));
-        Log.d("Converter", numbers.toString());
+        //Log.d("Converter", numbers.toString());
         return numbers.stream()
                 .map(Converter::NullToInt)
                 .collect(Collectors.toList());
@@ -147,29 +150,54 @@ class NewsEntity {
     private String mEventId;
     private String mType;
     private String mTitle;
-    private String mCatagory;
+    private String mCategory;
     private String mTime;
     private String mLang;
     private String mContent;
+    private String mSource;
+    private String mURLSource;
     private List<String> mRelatedNews = new ArrayList<>();
 
-    public NewsEntity(final String id, final String type, final String title, final String catagory,
+    @NotNull
+    @Override
+    public String toString() {
+        return "id:" + mEventId + ";title:" + mTitle + ";content:" + mContent + ";type:" + mType + ";category:" + mCategory + " time:" + mTime
+                + ";lang:" + mLang + ";source:" + mSource + ";url:" + mURLSource + " related:" + mRelatedNews.toString();
+    }
+
+    public NewsEntity(final String id, final String type, final String title, final String category,
                       final String time, final String lang) {
         this.mEventId = id;
-        this.mCatagory = catagory;
+        this.mCategory = category;
         this.mTitle = title;
         this.mTime = time;
         this.mLang = lang;
         this.mType = type;
-        this.readContent();
+        this.readContent(this.mEventId);
     }
 
-    private void readContent() {
+    private void readContent(final String eventId) {
         try{
-            JSONObject json_obj = BaseDataParser.getJsonData(url_prefix + this.mEventId);
+            JSONObject json_obj = BaseDataParser.getJsonData(url_prefix + eventId).getJSONObject("data");
+            this.mTitle = json_obj.getString("title");
+            this.mContent = json_obj.getString("content");
+            JSONArray urlArr = json_obj.getJSONArray("urls");
+            this.mURLSource = urlArr.size() > 0 ? urlArr.getString(0) : null;
+            this.initRelatedEvents(json_obj.getJSONArray("related_events"));
+            this.mSource = json_obj.getString("source");
+            if (this.mContent.equals("")) {
+                this.mContent = json_obj.getString("seg_text").replace(" ","");
+            }
         } catch (IOException e) {
-            this.mContent = "NULL";
+            this.mContent = "Oh! You Found Nothing Here!";
+            this.mURLSource = null;
+            this.mSource = "Unkown";
         }
+    }
+
+    private void initRelatedEvents(@NotNull JSONArray relatedEventsJSONArray) {
+        relatedEventsJSONArray.forEach(
+                jsonObj -> this.mRelatedNews.add(((JSONObject)jsonObj).getString("id")));
     }
 }
 
@@ -185,8 +213,6 @@ class BaseDataParser {
             total.append(input_json);
         }
         json_in.close();
-        //Log.d("DataParser", total.toString());
-        //Log.d("DataParser", json_obj.toString());
         return JSON.parseObject(total.toString());
     }
 }
@@ -197,7 +223,7 @@ class EpidemicDataParser extends BaseDataParser {
         return BaseDataParser.getJsonData(url);
     }
     @NotNull
-    public static Map<String, CountryEpidemicData> jsonToList() throws IOException {
+    public static Map<String, CountryEpidemicData> fetchData() throws IOException {
         JSONObject json_obj = getJsonData();
         Map<String, CountryEpidemicData> edataset = new HashMap<>();
         for(Map.Entry entry: json_obj.entrySet()) {
@@ -205,7 +231,7 @@ class EpidemicDataParser extends BaseDataParser {
             String[] locationInfo = key.split("\\|");
             if (locationInfo.length == 1) {
                 JSONObject value = json_obj.getJSONObject(key);
-                List<Integer> data = Converter.StringToList(value.getString("data"), ",", 4);
+                List<Integer> data = Converter.StringListToList(value.getString("data"), ",", 4);
                 edataset.put(locationInfo[0], new CountryEpidemicData(key, value.getString("begin"), data));
             }
         }
@@ -214,7 +240,7 @@ class EpidemicDataParser extends BaseDataParser {
             String[] locationInfo = key.split("\\|");
             if (locationInfo.length > 1 && edataset.containsKey(locationInfo[0])) {
                 JSONObject value = json_obj.getJSONObject(key);
-                List<Integer> data = Converter.StringToList(value.getString("data"), ",", 4);
+                List<Integer> data = Converter.StringListToList(value.getString("data"), ",", 4);
                 Objects.requireNonNull(edataset.get(locationInfo[0])).addProvince(new ProvinceEpidemicData(key, value.getString("begin"), data));
             }
         }
@@ -228,7 +254,28 @@ class EventsDataParser extends BaseDataParser {
     public static JSONObject getJsonData() throws IOException {
         return BaseDataParser.getJsonData(url);
     }
-    public static
+    @NotNull
+    public static List<NewsEntity> fetchData() throws IOException {
+        JSONArray eventsArray = getJsonData().getJSONArray("datas");
+        List<NewsEntity> eventsList = new ArrayList<>();
+        eventsArray.forEach(
+                jsonObj -> EventsDataParser.addEventToList((JSONObject) jsonObj, eventsList));
+        return eventsList;
+    }
+
+    private static void addEventToList(JSONObject jsonObj, @NotNull List<NewsEntity> eventsList) {
+        if(jsonObj == null) return;
+        NewsEntity event = new NewsEntity(
+                jsonObj.getString("_id"),
+                jsonObj.getString("type"),
+                jsonObj.getString("title"),
+                jsonObj.getString("category"),
+                jsonObj.getString("time"),
+                jsonObj.getString("lang")
+        );
+        Log.d("addEventToList", event.toString());
+        eventsList.add(event);
+    }
 }
 
 class SearchEntityDataParser extends BaseDataParser {
@@ -236,6 +283,7 @@ class SearchEntityDataParser extends BaseDataParser {
     public static JSONObject getJsonData(final String keyword) throws IOException {
         return BaseDataParser.getJsonData(url + keyword);
     }
+
 }
 
 class ExpertsDataParser extends BaseDataParser {
@@ -258,8 +306,9 @@ public class MainActivity extends AppCompatActivity {
 
     Runnable networkTask = () -> {
         try {
-            Map<String, CountryEpidemicData> temp = EpidemicDataParser.jsonToList();
-            Log.d("Main", temp.toString());
+            //Map<String, CountryEpidemicData> temp = EpidemicDataParser.fetchData();
+            //Log.d("Main", temp.toString());
+            List<NewsEntity> eventsList = EventsDataParser.fetchData();
         } catch (IOException e) {
             e.printStackTrace();
         }
