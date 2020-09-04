@@ -309,6 +309,7 @@ class SearchEntityDataParser extends BaseDataParser {
                 entityObj.getString("label"),
                 entityObj.getString("url"),
                 intro,
+                entityObj.getString("img"),
                 abstractInfo.getJSONObject("COVID")
         );
         entityList.add(entity);
@@ -339,13 +340,15 @@ class SearchEntity {
     private String mLabel;
     private String mURL;
     private String mIntroduction;
+    private String mImageURL;
     private Map<String, String> mPropertyMap = new HashMap<>();
     private List<RelationEntity> mRelationList = new ArrayList<>();
 
-    public SearchEntity(final double hot, final String label, final String url, final String intro, JSONObject graphJson) {
+    public SearchEntity(final double hot, final String label, final String url, final String intro, final String imgurl, JSONObject graphJson) {
         this.mHotRate = hot;
         this.mLabel = label;
         this.mURL = url;
+        this.mImageURL = imgurl;
         this.mIntroduction = intro;
         this.parseGraphJsonInfo(graphJson);
     }
@@ -353,7 +356,7 @@ class SearchEntity {
     @NotNull
     public String toString() {
         return "hot: " + mHotRate + " label:" + mLabel + " url:" + mURL + " intro:" + mIntroduction
-                + " property:" + mPropertyMap + " relation:" + mRelationList;
+                + " img:" + mImageURL + " property:" + mPropertyMap + " relation:" + mRelationList;
     }
 
     private void parseGraphJsonInfo(@NotNull JSONObject graph) {
@@ -477,14 +480,14 @@ public class MainActivity extends AppCompatActivity {
 
             //List<NewsEntity> eventsList = EventsDataParser.fetchData();
 
-            //List<SearchEntity> searchResult = SearchEntityDataParser.fetchSearchEntities("病毒");
-            //Log.d("main", searchResult.toString());
-            //Log.d("size", String.valueOf(searchResult.size()));
+            List<SearchEntity> searchResult = SearchEntityDataParser.fetchSearchEntities("病毒");
+            Log.d("main", searchResult.toString());
+            Log.d("size", String.valueOf(searchResult.size()));
 
-            List<ExpertEntity> expertList = ExpertsDataParser.fetchExpertsList();
-            for(ExpertEntity expert: expertList){
-                Log.d("main", expert.toString());
-            }
+            //List<ExpertEntity> expertList = ExpertsDataParser.fetchExpertsList();
+            //for(ExpertEntity expert: expertList){
+            //    Log.d("main", expert.toString());
+            //}
         } catch (IOException e) {
             e.printStackTrace();
         }
