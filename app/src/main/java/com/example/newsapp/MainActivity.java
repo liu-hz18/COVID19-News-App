@@ -284,13 +284,179 @@ class SearchEntityDataParser extends BaseDataParser {
         return BaseDataParser.getJsonData(url + keyword);
     }
 
+    @NotNull
+    public static List<SearchEntity> fetchSearchEntities(final String keyword) throws IOException {
+        List<SearchEntity> entityList = new ArrayList<>();
+        JSONObject entityJson = BaseDataParser.getJsonData(url + keyword);
+        if (entityJson != null && entityJson.getJSONArray("data").size() > 0) {
+            entityJson.getJSONArray("data").forEach(
+                    jsonObj -> parseEntityJsonObject((JSONObject)jsonObj, entityList));
+        }
+        return entityList;
+    }
+
+    private static void parseEntityJsonObject(@NotNull JSONObject entityObj, List<SearchEntity> entityList) {
+        JSONObject abstractInfo = entityObj.getJSONObject("abstractInfo");
+        String intro = abstractInfo.getString("baidu");
+        if (intro.equals("")) {
+            intro = abstractInfo.getString("zhwiki");
+        }
+        if (intro.equals("")) {
+            intro = abstractInfo.getString("enwiki");
+        }
+        SearchEntity entity = new SearchEntity(
+                entityObj.getDouble("hot"),
+                entityObj.getString("label"),
+                entityObj.getString("url"),
+                intro,
+                abstractInfo.getJSONObject("COVID")
+        );
+        entityList.add(entity);
+    }
 }
+
+class RelationEntity {
+    private String mRelation;
+    private String mRelationURL;
+    private String mLabel;
+    private boolean isForward;
+
+    public RelationEntity(final String relation, final String url, final String label, final boolean forward) {
+        this.mRelation = relation;
+        this.mRelationURL = url;
+        this.mLabel = label;
+        this.isForward = forward;
+    }
+
+    @NotNull
+    public String toString() {
+        return "relation:" + mRelation + " url:" + mRelationURL + " label:" + mLabel + " forward:" + isForward;
+    }
+}
+
+class SearchEntity {
+    private Double mHotRate;
+    private String mLabel;
+    private String mURL;
+    private String mIntroduction;
+    private Map<String, String> mPropertyMap = new HashMap<>();
+    private List<RelationEntity> mRelationList = new ArrayList<>();
+
+    public SearchEntity(final double hot, final String label, final String url, final String intro, JSONObject graphJson) {
+        this.mHotRate = hot;
+        this.mLabel = label;
+        this.mURL = url;
+        this.mIntroduction = intro;
+        this.parseGraphJsonInfo(graphJson);
+    }
+
+    @NotNull
+    public String toString() {
+        return "hot: " + mHotRate + " label:" + mLabel + " url:" + mURL + " intro:" + mIntroduction
+                + " property:" + mPropertyMap + " relation:" + mRelationList;
+    }
+
+    private void parseGraphJsonInfo(@NotNull JSONObject graph) {
+        JSONObject propertyJSON = graph.getJSONObject("properties");
+        for(Map.Entry entry: propertyJSON.entrySet()) {
+            mPropertyMap.put((String) entry.getKey(), (String) entry.getValue());
+        }
+        graph.getJSONArray("relations").forEach(
+                relation -> parseRelationJsonObj((JSONObject) relation));
+    }
+
+    private void parseRelationJsonObj(@NotNull JSONObject relationObj){
+        this.mRelationList.add(
+                new RelationEntity(
+                    relationObj.getString("relation"),
+                    relationObj.getString("url"),
+                    relationObj.getString("label"),
+                    relationObj.getBoolean("forward")
+                )
+        );
+    }
+}
+
+class ExpertEntity {
+    public String mImgURL;       //照片链接
+    private String mId;           //唯一标识
+    public String mZhName;       //中文名
+    public String mEnName;       //英文名
+    public String mEduIntro;     //教育经历
+    public String mBasicIntro;   //基本介绍
+    public String mAssociation;  //所属单位
+    public String mPosition;     //工作职位
+    public String mHomePage;     //个人主页
+    public Boolean hasPassedAway;//是追忆学者
+
+    public Integer mPublication; //发表数量
+    public Double mActivityRate; //活跃度
+    public Double mDiversityRate;//多样性
+    public Double mCitations;    //引用数量
+    public Double mGindex;       //学术成就：G指数
+    public Double mHindex;       //学术成就：H指数
+    public Double mSociability;   //社会性
+    public Double mNewStar;      //学术合作指数
+
+    public ExpertEntity(final String id) {
+        this.mId = id;
+    }
+
+    @NotNull
+    public String toString() {
+        return "id:" + mId + " name:" + mZhName + " enName:" + mEnName + " home:" + mHomePage + " img:" + mImgURL
+                + " base:" + mBasicIntro + " edu:" + mEduIntro + " association:" + mAssociation + " position:" + mPosition
+                + " passed:" + hasPassedAway + " pubs:" + mPublication + " activity:" + mActivityRate;
+    }
+}
+
 
 class ExpertsDataParser extends BaseDataParser {
     private final static String url = "https://innovaapi.aminer.cn/predictor/api/v1/valhalla/highlight/get_ncov_expers_list?v=2";
 
     public static JSONObject getJsonData() throws IOException {
         return BaseDataParser.getJsonData(url);
+    }
+
+    @NotNull
+    public static List<ExpertEntity> fetchExpertsList() throws IOException {
+        List<ExpertEntity> expertList = new ArrayList<>();
+        JSONObject experts = getJsonData();
+        if(experts != null) {
+            JSONArray expertsArr = experts.getJSONArray("data");
+            expertsArr.forEach(expertJson->parseExpertJsonObj((JSONObject) expertJson, expertList));
+        }
+        return expertList;
+    }
+
+    private static void parseExpertJsonObj(@NotNull JSONObject expertJson, @NotNull List<ExpertEntity> expertList) {
+        ExpertEntity expert = new ExpertEntity(expertJson.getString("id"));
+        expert.mImgURL = expertJson.getString("avatar");
+        expert.mEnName = expertJson.getString("name");
+        expert.mZhName = expertJson.getString("name_zh");
+        if(expert.mZhName.equals("")) expert.mZhName = expert.mEnName;
+        expert.hasPassedAway = expertJson.getBoolean("is_passedaway");
+
+        JSONObject profile = expertJson.getJSONObject("profile");
+        expert.mAssociation = profile.getString("affiliation") + "/" + profile.getString("affiliation_zh");
+        expert.mBasicIntro = profile.getString("bio");
+        if(expert.mBasicIntro != null) expert.mBasicIntro = expert.mBasicIntro.replace("<br>", "");
+        expert.mEduIntro = profile.getString("edu");
+        if(expert.mEduIntro != null) expert.mEduIntro = expert.mEduIntro.replace("<br>", "");
+        expert.mHomePage = profile.getString("homepage");
+        expert.mPosition = profile.getString("position");
+
+        JSONObject indices = expertJson.getJSONObject("indices");
+        expert.mActivityRate = indices.getDouble("activity");
+        expert.mCitations = indices.getDouble("citations");
+        expert.mDiversityRate = indices.getDouble("diversity");
+        expert.mHindex = indices.getDouble("hindex");
+        expert.mGindex = indices.getDouble("gindex");
+        expert.mNewStar = indices.getDouble("newStar");
+        expert.mSociability = indices.getDouble("sociability");
+        expert.mPublication = indices.getInteger("pubs");
+
+        expertList.add(expert);
     }
 }
 
@@ -308,7 +474,17 @@ public class MainActivity extends AppCompatActivity {
         try {
             //Map<String, CountryEpidemicData> temp = EpidemicDataParser.fetchData();
             //Log.d("Main", temp.toString());
-            List<NewsEntity> eventsList = EventsDataParser.fetchData();
+
+            //List<NewsEntity> eventsList = EventsDataParser.fetchData();
+
+            //List<SearchEntity> searchResult = SearchEntityDataParser.fetchSearchEntities("病毒");
+            //Log.d("main", searchResult.toString());
+            //Log.d("size", String.valueOf(searchResult.size()));
+
+            List<ExpertEntity> expertList = ExpertsDataParser.fetchExpertsList();
+            for(ExpertEntity expert: expertList){
+                Log.d("main", expert.toString());
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
