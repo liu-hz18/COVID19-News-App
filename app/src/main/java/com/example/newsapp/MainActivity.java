@@ -1,5 +1,6 @@
 package com.example.newsapp;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Gravity;
@@ -34,6 +35,7 @@ public class MainActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
 
+    @SuppressLint("RtlHardcoded")
     public boolean onOptionsItemSelected(@NotNull MenuItem item) {
         // Handle item selection
         switch (item.getItemId()) {
@@ -44,6 +46,7 @@ public class MainActivity extends AppCompatActivity {
                 return super.onOptionsItemSelected(item);
         }
     }
+    @SuppressLint("RtlHardcoded")
     public boolean main_drawer_button_click(@NotNull MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
