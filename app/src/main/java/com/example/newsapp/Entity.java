@@ -112,7 +112,7 @@ class ProvinceEpidemicEntity extends EpidemicEntity {
     }
 }
 
-class NewsEntity {
+class NewsEntity extends BaseEntity {
     private static String url_prefix = "https://covid-dashboard-api.aminer.cn/event/";
     private String mEventId;
     private String mType;
@@ -145,7 +145,7 @@ class NewsEntity {
 
     private void readContent(final String eventId) {
         try{
-            JSONObject json_obj = BaseDataParser.getJsonData(url_prefix + eventId).getJSONObject("data");
+            JSONObject json_obj = BaseDataFetcher.getJsonData(url_prefix + eventId).getJSONObject("data");
             this.mTitle = json_obj.getString("title");
             this.mContent = json_obj.getString("content");
             JSONArray urlArr = json_obj.getJSONArray("urls");
@@ -170,7 +170,7 @@ class NewsEntity {
     }
 }
 
-class RelationEntity {
+class RelationEntity extends BaseEntity {
     private String mRelation;
     private String mRelationURL;
     private String mLabel;
@@ -189,7 +189,7 @@ class RelationEntity {
     }
 }
 
-class SearchEntity {
+class SearchEntity extends BaseEntity {
     private Double mHotRate;
     private String mLabel;
     private String mURL;
@@ -206,13 +206,7 @@ class SearchEntity {
         this.mIntroduction = intro;
         this.parseGraphJsonInfo(graphJson);
     }
-
-    @NotNull
-    public String toString() {
-        return "hot: " + mHotRate + " label:" + mLabel + " url:" + mURL + " intro:" + mIntroduction
-                + " img:" + mImageURL + " property:" + mPropertyMap + " relation:" + mRelationList;
-    }
-
+    
     private void parseGraphJsonInfo(@NotNull JSONObject graph) {
         JSONObject propertyJSON = graph.getJSONObject("properties");
         for(Map.Entry entry: propertyJSON.entrySet()) {
@@ -232,9 +226,15 @@ class SearchEntity {
                 )
         );
     }
+
+    @NotNull
+    public String toString() {
+        return "hot: " + mHotRate + " label:" + mLabel + " url:" + mURL + " intro:" + mIntroduction
+                + " img:" + mImageURL + " property:" + mPropertyMap + " relation:" + mRelationList;
+    }
 }
 
-class ExpertEntity {
+class ExpertEntity extends BaseEntity {
     public String mImgURL;       //照片链接
     private String mId;           //唯一标识
     public String mZhName;       //中文名
