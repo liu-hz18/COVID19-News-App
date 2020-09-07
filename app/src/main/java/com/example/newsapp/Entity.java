@@ -2,38 +2,42 @@ package com.example.newsapp;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.alibaba.fastjson.annotation.JSONField;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.TypeReference;
 
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import org.litepal.annotation.Column;
+import org.litepal.crud.LitePalSupport;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
-class BaseEntity { }
+class BaseEntity extends LitePalSupport implements Serializable {
+    private static final long serialVersionUID = 7356423530030029215L;
+}
 
-class EpidemicEntity extends BaseEntity {
+class EpidemicEntity extends BaseEntity implements Serializable {
     private static final String TAG = "EpidemicEntity";
-    @JSONField(name = "begin")
-    private String mBegin;
+    private static final long serialVersionUID = -855436446091606681L;
+    @Column(unique = true)
+    public String mRegion;
+    public String  mBegin;  //format: "YYYY-MM-DD"
+    public Integer mConfirmed;
+    public Integer mSuspected;
+    public Integer mCured;
+    public Integer mDead;
 
-    @JSONField(name = "confirmed")
-    private Integer mConfirmed;
-
-    @JSONField(name = "suspected")
-    private Integer mSuspected;
-
-    @JSONField(name = "cured")
-    private Integer mCured;
-
-    @JSONField(name = "dead")
-    private Integer mDead;
-
-    public EpidemicEntity(final String begin, final int confirmed, final int suspected, final int cured, final int dead) {
+    public EpidemicEntity(final String region, final String begin, final int confirmed, final int suspected, final int cured, final int dead) {
         super();
+        this.mRegion = region;
         this.mBegin = begin;
         this.mConfirmed = confirmed;
         this.mCured = cured;
@@ -41,85 +45,97 @@ class EpidemicEntity extends BaseEntity {
         this.mDead = dead;
     }
 
-    public EpidemicEntity(final String begin, @NotNull final List<Integer> data) {
-        this(begin, data.get(0), data.get(1), data.get(2), data.get(3));
+    public EpidemicEntity() {
+        super();
+        this.mRegion = "unknown";
+        this.mBegin = "2020/1/1";
+        this.mConfirmed = 0;
+        this.mCured = 0;
+        this.mSuspected = 0;
+        this.mDead = 0;
+    }
+
+    public EpidemicEntity(final String region, final String begin, @NotNull final ArrayList<Integer> data) {
+        this(region, begin, data.get(0), data.get(1), data.get(2), data.get(3));
+    }
+
+    @Override
+    public String toString() {
+        return "region:" + mRegion + " begin:" + mBegin + " confirmed:" + mConfirmed + " cured:" + mCured
+                + " suspected:" + mSuspected + " dead:" + mDead + "\n";
     }
 
     @Contract(pure = true)
-    public final int getDead() {
-        return this.mDead;
-    }
+    public final int getmDead() { return this.mDead; }
 
     @Contract(pure = true)
-    public final int getConfirmed() {
-        return this.mConfirmed;
-    }
+    public final int getmConfirmed() { return this.mConfirmed; }
 
     @Contract(pure = true)
-    public final int getSuspected() {
-        return this.mSuspected;
-    }
+    public final int getmSuspected() { return this.mSuspected; }
 
     @Contract(pure = true)
-    public final int getCured() {
-        return this.mCured;
-    }
+    public final int getmCured() { return this.mCured; }
 
     @Contract(pure = true)
-    public final String getBeginDate() {  //format: "YYYY-MM-DD"
-        return this.mBegin;
-    }
+    public final String getmBeginDate() { return this.mBegin; }
 }
 
-class CountryEpidemicEntity extends EpidemicEntity {
+class CountryEpidemicEntity extends EpidemicEntity implements Serializable {
     private static final String TAG = "CountryEpidemicEntity";
-    @JSONField(name = "country")
-    private String mCountry;
+    private static final long serialVersionUID = -8691212280421542650L;
 
-    private Map<String, ProvinceEpidemicEntity> mProvinceData = new HashMap<>();
+    public CountryEpidemicEntity() { super(); }
 
     public CountryEpidemicEntity(final String country, final String begin, final int confirmed, final int suspected, final int cured, final int dead) {
-        super(begin, confirmed, suspected, cured, dead);
-        this.mCountry = country;
+        super(country, begin, confirmed, suspected, cured, dead);
     }
 
     public CountryEpidemicEntity(final String province, final String begin, @NotNull final List<Integer> numbers) {
         this(province, begin, numbers.get(0), numbers.get(1), numbers.get(2), numbers.get(3));
     }
 
-    public void addProvince(ProvinceEpidemicEntity provinceData) {
-        if (provinceData == null || mProvinceData.containsKey(provinceData.getProvince())) {
-            return;
-        }
-        mProvinceData.put(provinceData.getProvince(), provinceData);
-    }
+    @Contract(pure = true)
+    public final String getmRegion() { return mRegion; }
 }
 
-class ProvinceEpidemicEntity extends EpidemicEntity {
-    private static final String TAG = "ProvinceEpidemicEntity";
-    @JSONField(name = "Province")
-    private String mProvince;
+class ChinaProvinceEpidemicEntity extends EpidemicEntity implements Serializable {
+    private static final String TAG = "ChinaProvinceEpidemicEntity";
+    private static final long serialVersionUID = -7860418769398381283L;
 
-    @Contract(pure = true)
-    public final String getProvince() {
-        return mProvince;
+    public ChinaProvinceEpidemicEntity() { super(); }
+
+    public ChinaProvinceEpidemicEntity(final String province, final String begin, final int confirmed, final int suspected, final int cured, final int dead) {
+        super(province, begin, confirmed, suspected, cured, dead);
     }
 
-    public ProvinceEpidemicEntity(final String province, final String begin, final int confirmed, final int suspected, final int cured, final int dead) {
-        super(begin, confirmed, suspected, cured, dead);
-        this.mProvince = province;
-    }
-
-    public ProvinceEpidemicEntity(final String province, final String begin, @NotNull final List<Integer> numbers) {
+    public ChinaProvinceEpidemicEntity(final String province, final String begin, @NotNull final List<Integer> numbers) {
         this(province, begin, numbers.get(0), numbers.get(1), numbers.get(2), numbers.get(3));
     }
+
+    @Contract(pure = true)
+    public final String getmRegion() { return mRegion; }
 }
 
-class NewsEntity extends BaseEntity {
+class NewsEntity extends BaseEntity implements Serializable {
     private static final String TAG = "NewsEntity";
+    private static final long serialVersionUID = -3420032682480832882L;
     private static String url_prefix = "https://covid-dashboard-api.aminer.cn/event/";
+    private static HashSet stopWords = new HashSet<>(
+            Arrays.asList("的", "\'", "-", "``", "，", "”", "“", "：", ":", "(", ")", ",",
+                    "和", "较", "。", "·", "）", "（", "I", "！", "!", "%", "、", "…", "--",
+                    ".", "就", "已", "从", "例", "将", "与", "或", "了", "中", "用", "在", "据",
+                    "有", "又", "不", "是", "《", "》", "—", "并", "向", "时", "了", "但", "正",
+                    "？", "说", "上", "下", "并", "之", ")", "(", "'", "而", "者", "老", "%",
+                    "|", "大", "过", "；", "给", "经", "and", "or", "but", "in", "the", "have",
+                    "do"));
+    private static String replaceWord = "<stop>";
+    @Column(unique = true)
     private String mEventId;
     private String mType;
+
+
+
     private String mTitle;
     private String mCategory;
     private String mTime;
@@ -127,17 +143,29 @@ class NewsEntity extends BaseEntity {
     private String mContent;
     private String mSource;
     private String mURLSource;
-    private List<String> mRelatedNews = new ArrayList<>();
+    public transient boolean viewed = false;
+    private ArrayList<String> mRelatedNews = new ArrayList<>();
+    private ArrayList<String> mTokens = new ArrayList<>();
+
+    public String getmEventId() { return mEventId; }
+    public ArrayList<String> getmRelatedNews() { return mRelatedNews; }
+    public ArrayList<String> getmTokens() { return mTokens; }
+    public String getType() { return mType; }
+    public String getTime() { return mTime; }
+    public String getmTitle() { return mTitle; }
 
     @NotNull
     @Override
     public String toString() {
         return "id:" + mEventId + ";title:" + mTitle + ";content:" + mContent + ";type:" + mType + ";category:" + mCategory + " time:" + mTime
-                + ";lang:" + mLang + ";source:" + mSource + ";url:" + mURLSource + " related:" + mRelatedNews.toString();
+                + ";lang:" + mLang + ";source:" + mSource + ";url:" + mURLSource + " related:" + mRelatedNews + " tokens:" + mTokens + "\n";
     }
+
+    public NewsEntity() { super(); }
 
     public NewsEntity(final String id, final String type, final String title, final String category,
                       final String time, final String lang) {
+        super();
         this.mEventId = id;
         this.mCategory = category;
         this.mTitle = title;
@@ -147,6 +175,11 @@ class NewsEntity extends BaseEntity {
         this.readContent(this.mEventId);
     }
 
+    public NewsEntity(final String id) {
+        super();
+        this.mEventId = id;
+    }
+
     private void readContent(final String eventId) {
         try{
             JSONObject json_obj = BaseDataFetcher.getJsonData(url_prefix + eventId).getJSONObject("data");
@@ -154,34 +187,48 @@ class NewsEntity extends BaseEntity {
             this.mContent = json_obj.getString("content");
             JSONArray urlArr = json_obj.getJSONArray("urls");
             this.mURLSource = urlArr.size() > 0 ? urlArr.getString(0) : null;
-            this.initRelatedEvents(json_obj.getJSONArray("related_events"));
+            this.initRelatedEvents(json_obj.getJSONArray("related_events"), mRelatedNews);
             this.mSource = json_obj.getString("source");
+            String segText = json_obj.getString("seg_text");
+            Collections.addAll(this.mTokens, segText.split(" "));
+            int size = this.mTokens.size();
+            for(int i = 0; i < size; i++) {
+                if(stopWords.contains(this.mTokens.get(i)))
+                    this.mTokens.set(i, replaceWord);
+            }
             if (this.mContent.equals("")) {
-                this.mContent = json_obj.getString("seg_text").replace(" ","");
+                this.mContent = segText.replace(" ","");
             }
         } catch (IOException e) {
             this.mContent = "Oh! You Found Nothing Here!";
             this.mURLSource = null;
-            this.mSource = "Unkown";
+            this.mSource = "unknown";
         }
     }
 
-    private void initRelatedEvents(JSONArray relatedEventsJSONArray) {
+    private void initRelatedEvents(JSONArray relatedEventsJSONArray, List<String> mRelatedNews) {
         if(relatedEventsJSONArray!=null && relatedEventsJSONArray.size() > 0){
             relatedEventsJSONArray.forEach(
-                    jsonObj -> this.mRelatedNews.add(((JSONObject)jsonObj).getString("id")));
+                    jsonObj -> mRelatedNews.add(((JSONObject)jsonObj).getString("id")));
         }
     }
+
 }
 
-class RelationEntity extends BaseEntity {
+class RelationEntity extends BaseEntity implements Serializable {
     private static final String TAG = "RelationEntity";
-    private String mRelation;
-    private String mRelationURL;
-    private String mLabel;
-    private boolean isForward;
+    private static final long serialVersionUID = -6118196070265765987L;
+
+    public String mRelation;
+    public String mRelationURL;
+    @Column(unique = true)
+    public String mLabel;
+    public boolean isForward;
+
+    public RelationEntity() { super(); }
 
     public RelationEntity(final String relation, final String url, final String label, final boolean forward) {
+        super();
         this.mRelation = relation;
         this.mRelationURL = url;
         this.mLabel = label;
@@ -190,21 +237,30 @@ class RelationEntity extends BaseEntity {
 
     @NotNull
     public String toString() {
-        return "relation:" + mRelation + " url:" + mRelationURL + " label:" + mLabel + " forward:" + isForward;
+        return "relation:" + mRelation + " url:" + mRelationURL + " label:" + mLabel + " forward:" + isForward + "\n";
     }
 }
 
-class SearchEntity extends BaseEntity {
+class SearchEntity extends BaseEntity implements Serializable {
     private static final String TAG = "SearchEntity";
-    private Double mHotRate;
-    private String mLabel;
-    private String mURL;
-    private String mIntroduction;
-    private String mImageURL;
-    private Map<String, String> mPropertyMap = new HashMap<>();
-    private List<RelationEntity> mRelationList = new ArrayList<>();
+    private static final long serialVersionUID = -8619878219055489349L;
+
+    public String getmLabel() {
+        return mLabel;
+    }
+    @Column(unique = true)
+    public String mLabel;   //实体名
+    public Double mHotRate;
+    public String mURL;
+    public String mIntroduction;
+    public String mImageURL;
+    public String mPropertyMapJsonStr;
+    public String mRelationListJsonStr;
+
+    public SearchEntity() { super(); }
 
     public SearchEntity(final double hot, final String label, final String url, final String intro, final String imgurl, JSONObject graphJson) {
+        super();
         this.mHotRate = hot;
         this.mLabel = label;
         this.mURL = url;
@@ -212,39 +268,75 @@ class SearchEntity extends BaseEntity {
         this.mIntroduction = intro;
         this.parseGraphJsonInfo(graphJson);
     }
+
+    public SearchEntity(final double hot, final String label, final String url, final String intro, final String imgurl, final String mPropertyMapJsonStr, final String mRelationListJsonStr) {
+        super();
+        this.mHotRate = hot;
+        this.mLabel = label;
+        this.mURL = url;
+        this.mImageURL = imgurl;
+        this.mIntroduction = intro;
+        this.mRelationListJsonStr = mRelationListJsonStr;
+        this.mPropertyMapJsonStr = mPropertyMapJsonStr;
+    }
     
     private void parseGraphJsonInfo(@NotNull JSONObject graph) {
         JSONObject propertyJSON = graph.getJSONObject("properties");
+        if(propertyJSON == null)return;
+        Map<String, String> mPropertyMap = new HashMap<>();
         for(Map.Entry entry: propertyJSON.entrySet()) {
             mPropertyMap.put((String) entry.getKey(), (String) entry.getValue());
         }
+        mPropertyMapJsonStr = JSON.toJSONString(mPropertyMap);
+
+        ArrayList<RelationEntity> mRelationList = new ArrayList<>();
         graph.getJSONArray("relations").forEach(
-                relation -> parseRelationJsonObj((JSONObject) relation));
+                relation -> parseRelationJsonObj((JSONObject) relation, mRelationList));
+        this.mRelationListJsonStr = JSONObject.toJSONString(mRelationList);
     }
 
-    private void parseRelationJsonObj(@NotNull JSONObject relationObj){
-        this.mRelationList.add(
-                new RelationEntity(
-                        relationObj.getString("relation"),
-                        relationObj.getString("url"),
-                        relationObj.getString("label"),
-                        relationObj.getBoolean("forward")
-                )
+    public Map<String, Object> getmPropertyMap() {
+        return JSONObject.parseObject(this.mPropertyMapJsonStr);
+    }
+
+    public List<RelationEntity> getmRelationList() {
+        return JSON.parseObject(this.mRelationListJsonStr, new TypeReference<ArrayList<RelationEntity>>(){});
+    }
+
+    private void parseRelationJsonObj(@NotNull JSONObject relationObj, @NotNull List<RelationEntity> mRelationList){
+        RelationEntity relation = new RelationEntity(
+                relationObj.getString("relation"),
+                relationObj.getString("url"),
+                relationObj.getString("label"),
+                relationObj.getBoolean("forward")
         );
+        mRelationList.add(relation);
     }
 
     @NotNull
     public String toString() {
         return "hot: " + mHotRate + " label:" + mLabel + " url:" + mURL + " intro:" + mIntroduction
-                + " img:" + mImageURL + " property:" + mPropertyMap + " relation:" + mRelationList;
+                + " img:" + mImageURL + " property:" + getmPropertyMap() + " relation:" + getmRelationList() + "\n";
     }
 }
 
-class ExpertEntity extends BaseEntity {
+class ExpertEntity extends BaseEntity implements Serializable {
     private static final String TAG = "ExpertEntity";
+    private static final long serialVersionUID = 84249644034675389L;
     public String mImgURL;       //照片链接
-    private String mId;           //唯一标识
+    @Column(unique = true)
+    private String mId;          //唯一标识
+
+    public String getmZhName() {
+        return mZhName;
+    }
+
     public String mZhName;       //中文名
+
+    public String getmEnName() {
+        return mEnName;
+    }
+
     public String mEnName;       //英文名
     public String mEduIntro;     //教育经历
     public String mBasicIntro;   //基本介绍
@@ -262,14 +354,12 @@ class ExpertEntity extends BaseEntity {
     public Double mSociability;   //社会性
     public Double mNewStar;      //学术合作指数
 
-    public ExpertEntity(final String id) {
-        this.mId = id;
-    }
+    public ExpertEntity(final String id) { super(); this.mId = id; }
 
     @NotNull
     public String toString() {
         return "id:" + mId + " name:" + mZhName + " enName:" + mEnName + " home:" + mHomePage + " img:" + mImgURL
                 + " base:" + mBasicIntro + " edu:" + mEduIntro + " association:" + mAssociation + " position:" + mPosition
-                + " passed:" + hasPassedAway + " pubs:" + mPublication + " activity:" + mActivityRate;
+                + " passed:" + hasPassedAway + " pubs:" + mPublication + " activity:" + mActivityRate + "\n";
     }
 }

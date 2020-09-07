@@ -16,9 +16,8 @@ public class Utils {
 class Converter {
     @RequiresApi(api = Build.VERSION_CODES.N)
     public static List<Integer> StringListToList(@NotNull String listString, final String splitKey, final int topk) {
-        String str = listString.toString().replace("[","").replace("]","");
+        String str = listString.replace("[","").replace("]","");
         List<String> numbers = Arrays.asList(Arrays.copyOf(str.split(splitKey), topk));
-        //Log.d("Converter", numbers.toString());
         return numbers.stream()
                 .map(Converter::NullToInt)
                 .collect(Collectors.toList());
