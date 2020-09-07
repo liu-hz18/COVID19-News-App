@@ -44,9 +44,9 @@ class Updater {
     }
 
     static void init(){
+        AllUpdater.initNews();
         NewsUpdater.initNews();
         PaperUpdater.initNews();
-        AllUpdater.initNews();
     }
 
     static void updatePullUpNews(final String type) {
@@ -81,6 +81,20 @@ class Updater {
                 return AllUpdater.getDisplayingNews();
         }
     }
+
+    static void logViewed(NewsEntity news) {
+        switch (news.getType()) {
+            case "news":
+                NewsUpdater.logViewed(news);
+                break;
+            case "paper":
+                PaperUpdater.logViewed(news);
+                break;
+            default:
+        }
+        AllUpdater.logViewed(news);
+    }
+
 }
 
 

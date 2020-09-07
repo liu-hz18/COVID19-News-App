@@ -111,7 +111,7 @@ public class SearchEngine {
     }
 
     @NotNull
-    public static ArrayList<String> searchKeyWords(@NotNull List<String> keyWordsList) {
+    public static List<String> searchKeyWords(@NotNull List<String> keyWordsList) {
         Log.d("searchKeyWords", keyWordsList.toString());
 
         Map<String, Tuple> fileIdValues = new HashMap<>();
@@ -136,7 +136,7 @@ public class SearchEngine {
         ids.forEach(tuple -> finalFileIds.add(tuple.first));
         Log.d("number", String.valueOf(finalFileIds.size()));
         if(finalFileIds.size() > maxReturnNumber){
-            return (ArrayList<String>) finalFileIds.subList(0, maxReturnNumber);
+            return finalFileIds.subList(0, maxReturnNumber);
         }
         return finalFileIds;
     }
@@ -146,7 +146,7 @@ public class SearchEngine {
     }
 
     @NotNull
-    public static ArrayList<String> searchString(@NotNull String str) {
+    public static List<String> searchString(@NotNull String str) {
         return searchKeyWords(tokenize(str));
     }
 }

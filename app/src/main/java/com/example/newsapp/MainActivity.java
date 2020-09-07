@@ -106,7 +106,7 @@ public class MainActivity extends AppCompatActivity {
         Log.d("data", Objects.requireNonNull(expertList).toString());
         */
         //SearchEngine
-        SearchEngine.init(true);
+        SearchEngine.init(false);
         //Log.d("searchresult:", DataLoader.loadNewsList(SearchEngine.searchKeyWords(Arrays.asList("病毒"))).toString());
         //Log.d("search: ", DataLoader.loadNewsList(SearchEngine.searchString("武汉病毒")).toString());
 

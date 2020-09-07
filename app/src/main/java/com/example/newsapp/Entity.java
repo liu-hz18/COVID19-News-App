@@ -133,9 +133,6 @@ class NewsEntity extends BaseEntity implements Serializable {
     @Column(unique = true)
     private String mEventId;
     private String mType;
-
-
-
     private String mTitle;
     private String mCategory;
     private String mTime;
@@ -143,7 +140,9 @@ class NewsEntity extends BaseEntity implements Serializable {
     private String mContent;
     private String mSource;
     private String mURLSource;
+
     public transient boolean viewed = false;
+
     private ArrayList<String> mRelatedNews = new ArrayList<>();
     private ArrayList<String> mTokens = new ArrayList<>();
 
@@ -153,6 +152,9 @@ class NewsEntity extends BaseEntity implements Serializable {
     public String getType() { return mType; }
     public String getTime() { return mTime; }
     public String getmTitle() { return mTitle; }
+    public String getmContent() { return mContent; }
+    public String getmSource() { return "来源:" + mSource; }
+    public String getmURLSource() { return mURLSource; }
 
     @NotNull
     @Override
@@ -189,6 +191,7 @@ class NewsEntity extends BaseEntity implements Serializable {
             this.mURLSource = urlArr.size() > 0 ? urlArr.getString(0) : null;
             this.initRelatedEvents(json_obj.getJSONArray("related_events"), mRelatedNews);
             this.mSource = json_obj.getString("source");
+            if(this.mSource.equals("")) this.mSource = "未知";
             String segText = json_obj.getString("seg_text");
             Collections.addAll(this.mTokens, segText.split(" "));
             int size = this.mTokens.size();
@@ -196,7 +199,7 @@ class NewsEntity extends BaseEntity implements Serializable {
                 if(stopWords.contains(this.mTokens.get(i)))
                     this.mTokens.set(i, replaceWord);
             }
-            if (this.mContent.equals("")) {
+            if (this.mContent.equals("") && this.mLang.equals("zh")) {
                 this.mContent = segText.replace(" ","");
             }
         } catch (IOException e) {

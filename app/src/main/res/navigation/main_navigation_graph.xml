@@ -8,10 +8,25 @@
         android:id="@+id/news_main_fragment"
         android:name="com.example.newsapp.main_news_fragment"
         android:label="fragment_news_main_fragment"
-        tools:layout="@layout/news_main_fragment" />
+        tools:layout="@layout/news_main_fragment" >
+        <action
+            android:id="@+id/action_view_news_body"
+            app:destination="@id/news_detail_fragment" />
+    </fragment>
+
     <fragment
         android:id="@+id/data_main_fragment"
         android:name="com.example.newsapp.main_news_fragment"
         android:label="fragment_data_main_fragment"
         tools:layout="@layout/data_main_fragment" />
+
+    <fragment
+        android:id="@+id/news_detail_fragment"
+        android:name="com.example.newsapp.news_detail_fragment"
+        android:label="news_body_fragment"
+        tools:layout="@layout/news_detail_fragment" >
+        <argument
+            android:name="news"
+            app:argType="com.example.newsapp.NewsEntity" />
+    </fragment>
 </navigation>

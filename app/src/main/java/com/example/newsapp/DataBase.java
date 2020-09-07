@@ -16,20 +16,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-class DataBase {
-    public static void deleteDataBase(final String name) {
-        File file = new File("/data/user/0/com.example.newsapp/databases/" + name + ".db");
-        if(file.exists() && file.isFile()) {
-            Log.d("delete db: ", String.valueOf(file.delete()));
-        }
-        File Jfile = new File("/data/user/0/com.example.newsapp/databases/" + name + ".db-journal");
-        if(Jfile.exists() && Jfile.isFile()) {
-            Log.d("delete db-journal: ", String.valueOf(Jfile.delete()));
-        }
-    }
-}
-
-
 //加载数据
 class DataLoader {
     @NotNull
@@ -40,11 +26,8 @@ class DataLoader {
     @NotNull
     public static List<NewsEntity> loadNewsList(@NotNull List<String> newsList) { //O(nlogn+klogn)
         List<NewsEntity> related = new ArrayList<>();
-        NewsEntity news = null;
         List<NewsEntity> allNewsList = EventsDataFetcher.fetchAllData(false);
-        Collections.sort(allNewsList, (left, right) -> {
-            return left.getmEventId().compareTo(right.getmEventId());
-        });
+        Collections.sort(allNewsList, (left, right) -> left.getmEventId().compareTo(right.getmEventId()));
         int id;
         for (String newsId: newsList) {
             if((id = Collections.binarySearch(allNewsList, new NewsEntity(newsId), (left, right) -> left.getmEventId().compareTo(right.getmEventId()))) >= 0){

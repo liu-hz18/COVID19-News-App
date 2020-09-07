@@ -60,18 +60,15 @@ class EpidemicDataFetcher extends BaseDataFetcher {
             String[] locationInfo = key.split("\\|");
             JSONObject value = json_obj.getJSONObject(key);
             JSONArray dataArr = value.getJSONArray("data");
-            //Log.d("last", dataArr.get(dataArr.size()-1).toString() + key + " ");
             List<Integer> data = Converter.StringListToList(dataArr.get(dataArr.size()-1).toString(), ",", 4);
             switch (locationInfo.length){
                 case 1:
                     CountryEpidemicEntity countryData = new CountryEpidemicEntity(key, value.getString("begin"), data);
-                    //countryData.save();
                     countryDataList.add(countryData);
                     break;
                 case 2:
                     if (locationInfo[0].equals("China")){
                         ChinaProvinceEpidemicEntity provinceData = new ChinaProvinceEpidemicEntity(key, value.getString("begin"), data);
-                        //provinceData.save();
                         chinaDataList.add(provinceData);
                     }
                     break;
