@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+
 public class news_detail_fragment extends Fragment{
     public news_detail_fragment() {
         // Required empty public constructor

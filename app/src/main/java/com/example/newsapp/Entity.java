@@ -79,6 +79,9 @@ class EpidemicEntity extends BaseEntity implements Serializable {
 
     @Contract(pure = true)
     public final String getmBeginDate() { return this.mBegin; }
+
+    @Contract(pure = true)
+    public final String getmRegion() { return mRegion; }
 }
 
 class CountryEpidemicEntity extends EpidemicEntity implements Serializable {
@@ -94,9 +97,6 @@ class CountryEpidemicEntity extends EpidemicEntity implements Serializable {
     public CountryEpidemicEntity(final String province, final String begin, @NotNull final List<Integer> numbers) {
         this(province, begin, numbers.get(0), numbers.get(1), numbers.get(2), numbers.get(3));
     }
-
-    @Contract(pure = true)
-    public final String getmRegion() { return mRegion; }
 }
 
 class ChinaProvinceEpidemicEntity extends EpidemicEntity implements Serializable {
@@ -112,9 +112,6 @@ class ChinaProvinceEpidemicEntity extends EpidemicEntity implements Serializable
     public ChinaProvinceEpidemicEntity(final String province, final String begin, @NotNull final List<Integer> numbers) {
         this(province, begin, numbers.get(0), numbers.get(1), numbers.get(2), numbers.get(3));
     }
-
-    @Contract(pure = true)
-    public final String getmRegion() { return mRegion; }
 }
 
 class NewsEntity extends BaseEntity implements Serializable {
@@ -177,7 +174,7 @@ class NewsEntity extends BaseEntity implements Serializable {
         this.readContent(this.mEventId);
     }
 
-    public NewsEntity(final String id) {
+    NewsEntity(final String id) {
         super();
         this.mEventId = id;
     }
@@ -240,7 +237,7 @@ class RelationEntity extends BaseEntity implements Serializable {
 
     @NotNull
     public String toString() {
-        return "relation:" + mRelation + " url:" + mRelationURL + " label:" + mLabel + " forward:" + isForward + "\n";
+        return "relation:" + mRelation + " forward:" + isForward + " label:" + mLabel  + "\nurl:" + mRelationURL;
     }
 }
 
@@ -329,17 +326,7 @@ class ExpertEntity extends BaseEntity implements Serializable {
     public String mImgURL;       //照片链接
     @Column(unique = true)
     private String mId;          //唯一标识
-
-    public String getmZhName() {
-        return mZhName;
-    }
-
     public String mZhName;       //中文名
-
-    public String getmEnName() {
-        return mEnName;
-    }
-
     public String mEnName;       //英文名
     public String mEduIntro;     //教育经历
     public String mBasicIntro;   //基本介绍
@@ -365,4 +352,7 @@ class ExpertEntity extends BaseEntity implements Serializable {
                 + " base:" + mBasicIntro + " edu:" + mEduIntro + " association:" + mAssociation + " position:" + mPosition
                 + " passed:" + hasPassedAway + " pubs:" + mPublication + " activity:" + mActivityRate + "\n";
     }
+
+    public String getmZhName() { return mZhName; }
+    public String getmEnName() { return mEnName; }
 }

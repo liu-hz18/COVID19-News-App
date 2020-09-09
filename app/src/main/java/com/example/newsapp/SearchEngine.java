@@ -112,8 +112,6 @@ public class SearchEngine {
 
     @NotNull
     public static List<String> searchKeyWords(@NotNull List<String> keyWordsList) {
-        Log.d("searchKeyWords", keyWordsList.toString());
-
         Map<String, Tuple> fileIdValues = new HashMap<>();
         for(String keyword: keyWordsList) {
             if (invertedIndex.containsKey(keyword)) {

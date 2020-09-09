@@ -1,6 +1,8 @@
 package com.example.newsapp;
 
 import android.annotation.SuppressLint;
+import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
 
 import com.alibaba.fastjson.JSON;
@@ -239,12 +241,12 @@ class EventsDataFetcher extends BaseDataFetcher {
     public static List<NewsEntity> fetchAllData(final boolean update) {
         if(update) { update(); }
         if(allEventsList != null) return allEventsList;
+        Log.d("update", "load from disk");
         ArrayList<NewsEntity> allList = new ArrayList<>();
-        List<NewsEntity> temp = null;
-        if((temp = fetchDataFromMem(paperPath)) != null)allList.addAll(temp);
-        if((temp = fetchDataFromMem(newsPath)) != null)allList.addAll(temp);
-        allEventsList = allList;
-        return allList;
+        List<NewsEntity> temp;
+        if((temp = fetchNewsData(false)) != null)allList.addAll(temp);
+        if((temp = fetchPaperData(false)) != null)allList.addAll(temp);
+        return allEventsList = allList;
     }
 
     @Nullable
@@ -279,11 +281,17 @@ class SearchEntityDataFetcher extends BaseDataFetcher {
     private static final String TAG = "SearchEntityDataFetcher";
     private final static String url = "https://innovaapi.aminer.cn/covid/api/v1/pneumonia/entityquery?entity=";
     private static Map<String, List<SearchEntity>> searchHistory = new HashMap<>();
+    private static List<SearchEntity> searchResult;
+    public static int UPDATE_GRAPH_ENTITY = 0x3;
+    private static Handler mHandler;
 
     private static JSONObject getSearchEntityJsonData(final String keyword) throws IOException {
         return BaseDataFetcher.getJsonData(url + keyword);
     }
 
+    public static void setHandler(Handler handler) {
+        mHandler = handler;
+    }
 
     @Nullable
     private static List<SearchEntity> fetchDataFromNet(final String keyword) {
@@ -305,12 +313,24 @@ class SearchEntityDataFetcher extends BaseDataFetcher {
     }
 
     @NotNull
-    public static List<SearchEntity> fetchSearchEntities(final String keyword) {
-        if(searchHistory.containsKey(keyword)) {
-            return searchHistory.get(keyword);
-        } else {
-            return fetchDataFromNet(keyword);
-        }
+    public static void fetchSearchEntities(final String keyword) {
+        Thread newsTask = new Thread(() -> {
+            List<SearchEntity> result;
+            if(searchHistory.containsKey(keyword)) {
+                result = searchHistory.get(keyword);
+            } else {
+                result = fetchDataFromNet(keyword);
+            }
+            Message msg = Message.obtain(); // 实例化消息对象
+            msg.what = UPDATE_GRAPH_ENTITY; // 消息标识
+            if(mHandler != null) mHandler.sendMessage(msg);
+            searchResult = result;
+        });
+        newsTask.start();
+    }
+
+    public static List<SearchEntity> getSearchResult() {
+        return searchResult;
     }
 
     private static void parseEntityJsonObject(@NotNull JSONObject entityObj, List<SearchEntity> entityList) {
@@ -339,6 +359,7 @@ class ExpertsDataFetcher extends BaseDataFetcher {
     private static final String TAG = "ExpertsDataFetcher";
     private final static String url = "https://innovaapi.aminer.cn/predictor/api/v1/valhalla/highlight/get_ncov_expers_list?v=2";
     private static String dataPath = savePath + "experts.data";
+    public static int UPDATE_EXPERTS = 0x4;
 
     private static JSONObject getExpertsJsonData() throws IOException {
         return BaseDataFetcher.getJsonData(url);

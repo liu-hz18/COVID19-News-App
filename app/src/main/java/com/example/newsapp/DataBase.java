@@ -53,8 +53,8 @@ class DataLoader {
     }
 
     @NotNull
-    public static List<SearchEntity> loadSearchResult(final String keyword) {
-        return SearchEntityDataFetcher.fetchSearchEntities(keyword);
+    public static void loadSearchResult(final String keyword) {
+        SearchEntityDataFetcher.fetchSearchEntities(keyword);
     }
 
     @NotNull

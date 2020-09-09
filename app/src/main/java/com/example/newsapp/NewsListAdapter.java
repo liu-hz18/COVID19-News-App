@@ -8,41 +8,46 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.RecyclerView;
 
-import org.w3c.dom.Text;
+import com.jcodecraeer.xrecyclerview.XRecyclerView;
 
-import java.util.ArrayList;
+import org.jetbrains.annotations.NotNull;
+
 import java.util.LinkedList;
 import java.util.List;
 
 
-public class NewsListAdapter extends RecyclerView.Adapter<NewsListAdapter.NewsListViewHolder>{
+public class NewsListAdapter extends XRecyclerView.Adapter<NewsListAdapter.NewsListViewHolder>{
     List<NewsEntity> newslist;
-    static public class NewsListViewHolder extends RecyclerView.ViewHolder {
-        public ConstraintLayout layout;
-        public NewsListViewHolder(ConstraintLayout v) {
+
+    static public class NewsListViewHolder extends XRecyclerView.ViewHolder {
+        public View layout;
+        public NewsListViewHolder(View v) {
             super(v);
             layout = v;
         }
     }
     NewsListAdapter() { newslist = new LinkedList<>(); }
+
+    @NotNull
     @Override
     public NewsListViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        ConstraintLayout v = (ConstraintLayout) LayoutInflater.from(parent.getContext())
+        View v = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.single_news_layout, parent, false);
-        NewsListViewHolder vh = new NewsListViewHolder(v);
-        return vh;
+        return new NewsListViewHolder(v);
     }
+
     @SuppressLint({"ResourceAsColor", "SetTextI18n"})
     @Override
     public void onBindViewHolder(NewsListViewHolder holder, int position) {
         final NewsEntity news = newslist.get(position);
         TextView newsTextView = holder.layout.findViewById(R.id.news_title);
         TextView newsSourceView = holder.layout.findViewById(R.id.news_source);
-        newsTextView.setText(news.getmTitle());
+        String title = news.getmTitle();
+        if(title.length() > 40) title = title.substring(0, 40) + "...";
+        newsTextView.setText(title);
         newsSourceView.setText(news.getTime() + " " + news.getmSource());
         if (news.viewed) {
             newsTextView.setTextColor(0xffaaaaaa);
@@ -50,10 +55,10 @@ public class NewsListAdapter extends RecyclerView.Adapter<NewsListAdapter.NewsLi
             newsTextView.setTextColor(R.color.titleItemUnselColor);
         }
         holder.layout.findViewById(R.id.news_title).setOnClickListener(v -> {
-            Updater.logViewed(news);
             Bundle bundle = new Bundle();
             bundle.putSerializable("news", news);
             Navigation.findNavController(v).navigate(R.id.action_view_news_body, bundle);
+            Updater.logViewed(news);
         });
     }
     @Override

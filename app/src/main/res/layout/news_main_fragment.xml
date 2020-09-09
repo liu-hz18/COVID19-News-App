@@ -11,7 +11,7 @@
         android:layout_height="match_parent"
         tools:context=".MainActivity">
 
-        <androidx.recyclerview.widget.RecyclerView
+        <com.jcodecraeer.xrecyclerview.XRecyclerView
             android:id="@+id/news_list_recyclerview"
             android:layout_width="0dp"
             android:layout_height="0dp"
@@ -20,44 +20,35 @@
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/news_tab_layout"
-            app:layout_constraintVertical_bias="1.0" />
+            app:layout_constraintVertical_bias="1.0"
+            tools:ignore="UnknownId" />
 
-        <EditText
+        <TextView
             android:id="@+id/news_list_search_edittext"
             android:layout_width="0dp"
             android:layout_height="30dp"
             android:layout_marginStart="16dp"
             android:layout_marginTop="5dp"
             android:layout_marginEnd="16dp"
-            android:background="@drawable/ic_launcher_foreground"
             android:ems="10"
-            android:inputType="textPersonName"
             android:textColor="#604033"
             android:textSize="16sp"
+            android:text="  请输入搜索内容"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            android:autofillHints="" />
 
         <com.google.android.material.tabs.TabLayout
-            android:id="@+id/news_tab_layout"
+           android:id="@+id/news_tab_layout"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+           android:layout_height="wrap_content"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/news_list_search_edittext"
+           app:layout_constraintHorizontal_bias="0.0"
+           app:layout_constraintStart_toStartOf="parent"
+           app:layout_constraintTop_toBottomOf="@+id/news_list_search_edittext"
             app:tabMaxWidth="0dp" />
-
-        <ImageButton
-            android:id="@+id/search_button"
-            android:layout_width="34dp"
-            android:layout_height="35dp"
-            android:layout_marginEnd="-2dp"
-            android:background="#00EEFFFF"
-            android:scaleType="fitCenter"
-            android:src="@drawable/ic_launcher_background"
-            app:layout_constraintEnd_toEndOf="@+id/news_list_search_edittext"
-            app:layout_constraintTop_toTopOf="@+id/news_list_search_edittext" />
 
         <com.google.android.material.tabs.TabLayout
             android:id="@+id/history_tab_layout"
@@ -70,12 +61,12 @@
             <com.google.android.material.tabs.TabItem
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:icon="@drawable/ic_launcher_background" />
+                android:icon="@mipmap/cat_list" />
 
             <com.google.android.material.tabs.TabItem
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:icon="@drawable/ic_launcher_foreground" />
+                android:icon="@mipmap/copy" />
 
         </com.google.android.material.tabs.TabLayout>
 

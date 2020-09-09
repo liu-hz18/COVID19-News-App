@@ -55,6 +55,14 @@ dependencies {
     //scwang
     implementation  'com.scwang.smart:refresh-layout-kernel:2.0.1'
     implementation  'com.scwang.smart:refresh-header-classics:2.0.1'
+    implementation  'com.github.devlight.shadowlayout:library:1.0.2'
+    //img
+    implementation  'com.github.bumptech.glide:glide:4.5.0'
+    annotationProcessor 'com.github.bumptech.glide:compiler:4.5.0'
+    //mp-android chart
+    implementation 'com.github.PhilJay:MPAndroidChart:v3.0.3'
+    implementation 'com.carson_ho:SearchLayout:1.0.1'
+    implementation 'com.jcodecraeer:xrecyclerview:1.6.0'
 }
 
 configurations {

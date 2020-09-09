@@ -1,50 +1,34 @@
 package com.example.newsapp;
 import android.annotation.SuppressLint;
+import android.graphics.Color;
 import android.os.Bundle;
 
 import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
-import android.animation.LayoutTransition;
 import android.animation.ValueAnimator;
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.content.DialogInterface;
-import android.media.Image;
-import android.os.Bundle;
 
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.Handler;
 import android.os.Message;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
-import android.widget.ImageButton;
 import android.widget.LinearLayout;
-import android.widget.TableLayout;
 import android.widget.TextView;
 
-import com.google.android.material.tabs.TabItem;
 import com.google.android.material.tabs.TabLayout;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 
-import com.google.android.material.tabs.TabLayout;
-//import com.scwang.smart.refresh.footer.ClassicsFooter;
-//import com.scwang.smart.refresh.header.ClassicsHeader;
-//import com.scwang.smart.refresh.layout.api.RefreshLayout;
-//import com.scwang.smart.refresh.layout.listener.OnLoadMoreListener;
-//import com.scwang.smart.refresh.layout.listener.OnRefreshListener;
+import com.jcodecraeer.xrecyclerview.ProgressStyle;
+import com.jcodecraeer.xrecyclerview.XRecyclerView;
 
 
 import org.jetbrains.annotations.NotNull;
@@ -67,7 +51,6 @@ public class main_news_fragment extends Fragment {
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
-    private String[] mStrs = {"aaa", "bbb", "ccc", "airsaid"};
 
     // TODO: Rename and change types of parameters
     private String mParam1;
@@ -81,15 +64,15 @@ public class main_news_fragment extends Fragment {
     static private String pre_tab;
     static private int unfinished_animations = 0;
     public NewsListAdapter adapter;
-    private boolean scrolling_to_end = false;
     private String news_type = "all";
     private boolean view_history = false;
-    private EditText search_edittext;
+    static boolean searching = false;
+    private XRecyclerView mRecyclerView;
+    private TextView searchTextView;
 
     public main_news_fragment() {
         // Required empty public constructor
     }
-
     /**
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
@@ -98,7 +81,6 @@ public class main_news_fragment extends Fragment {
      * @param param2 Parameter 2.
      * @return A new instance of fragment news_main_fragment.
      */
-    // TODO: Rename and change types and number of parameters
     @NotNull
     public static main_news_fragment newInstance(String param1, String param2) {
         main_news_fragment fragment = new main_news_fragment();
@@ -122,47 +104,40 @@ public class main_news_fragment extends Fragment {
     public View onCreateView(@NotNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View ret_view =  inflater.inflate(R.layout.news_main_fragment, container, false);
-        RecyclerView recyclerView = (RecyclerView) ret_view.findViewById(R.id.news_list_recyclerview);
-        LinearLayoutManager layoutManager = new LinearLayoutManager( getActivity());
-        recyclerView.setLayoutManager(layoutManager);
+        View ret_view = inflater.inflate(R.layout.news_main_fragment, container, false);
+        pre_tab = "全部";
+        onCreateRecyclerView(ret_view);
+        onCreateHeaderTabLayout(ret_view);
+        onCreateBottomTabLayout(ret_view);
+        onCreateSearchEditText(ret_view);
+        return ret_view;
+    }
 
-        Handler mhandler = new EventsListUpdateHandler();
-        NewsUpdater.setHandler(mhandler);
-
-        adapter = new NewsListAdapter();
-        recyclerView.setAdapter(adapter);
-
-        refresh_callback();
-
-        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+    private void onCreateBottomTabLayout(View ret_view) {
+        ((TabLayout)ret_view.findViewById(R.id.history_tab_layout)).addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
-            public void onScrollStateChanged(@NotNull RecyclerView recyclerView, int newState) {
-                super.onScrollStateChanged(recyclerView, newState);
-                if (!recyclerView.canScrollVertically(1)) {//划到最低端时
-                    if(!scrolling_to_end) {
-                        Updater.updatePullDownNews(news_type);
-                    }
-                    scrolling_to_end = true;
-                } else if (!recyclerView.canScrollVertically(-1)) {//划到最顶端时
-                    if(!scrolling_to_end) {
-                        Updater.updatePullUpNews(news_type);
-                    }
-                    scrolling_to_end = true;
+            public void onTabSelected(TabLayout.Tab tab) {
+                if (tab.getPosition() == 1) {
+                    view_history = true;
+                    refresh_history();
                 } else {
-                    scrolling_to_end = false;
+                    view_history = false;
+                    changeType(news_type);
                 }
             }
+            @Override
+            public void onTabUnselected(TabLayout.Tab tab) { }
+            @Override
+            public void onTabReselected(TabLayout.Tab tab) { }
         });
-        scrolling_to_end = true;
+    }
 
-        pre_tab = "全部";
-        unfinished_animations = 0;
-        tablayout = (TabLayout)ret_view.findViewById(R.id.news_tab_layout);
+    private void onCreateHeaderTabLayout(View ret_view) {
+        tablayout = ret_view.findViewById(R.id.news_tab_layout);
         tablayout.setTabMode(TabLayout.MODE_SCROLLABLE);
         TabLayout.Tab temp_tab = tablayout.newTab().setText("全部");
         tablayout.addTab(temp_tab);
-        LinearLayout linearLayout = (LinearLayout)temp_tab.view;
+        LinearLayout linearLayout = temp_tab.view;
         LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams) linearLayout.getLayoutParams();
         layoutParams.width = 200;
         linearLayout.setLayoutParams(layoutParams);
@@ -170,7 +145,7 @@ public class main_news_fragment extends Fragment {
             news_class_visible[i] = true;
             news_class_handler[i] = new ClassHandler(tablayout.newTab().setText(news_class_names[i]));
             tablayout.addTab(news_class_handler[i].tab);
-            linearLayout = (LinearLayout)news_class_handler[i].tab.view;
+            linearLayout = news_class_handler[i].tab.view;
             layoutParams = (LinearLayout.LayoutParams) linearLayout.getLayoutParams();
             layoutParams.width = 200;
             linearLayout.setLayoutParams(layoutParams);
@@ -188,76 +163,82 @@ public class main_news_fragment extends Fragment {
                     from_dialog = false;
                     return;
                 }
-                CharSequence text = tab.getText();
-                pre_tab = text.toString();
-                if ("全部".contentEquals(text)) {
-                    news_type = "all";
-                    changeType(news_type);
-                } else if ("新闻".contentEquals(text)) {
-                    news_type = "news";
-                    changeType(news_type);
-                } else if ("论文".contentEquals(text)) {
-                    news_type = "paper";
-                    changeType(news_type);
-                } else if ("+".contentEquals(text)) {
-                    NewsClassDialog dialog = new NewsClassDialog();
-                    dialog.show(getActivity().getSupportFragmentManager(), "choose_class_dialog");
+                if(!view_history) {
+                    CharSequence text = tab.getText();
+                    pre_tab = text.toString();
+                    if ("全部".contentEquals(text)) {
+                        news_type = "all";
+                        searching = false;
+                        changeType(news_type);
+                    } else if ("新闻".contentEquals(text)) {
+                        news_type = "news";
+                        searching = false;
+                        changeType(news_type);
+                    } else if ("论文".contentEquals(text)) {
+                        news_type = "paper";
+                        searching = false;
+                        changeType(news_type);
+                    } else if ("+".contentEquals(text)) {
+                        NewsClassDialog dialog = new NewsClassDialog();
+                        dialog.show(getActivity().getSupportFragmentManager(), "choose_class_dialog");
+                    }
                 }
             }
             @Override
-            public void onTabSelected(TabLayout.Tab tab) {
-                change(tab);
-            }
+            public void onTabSelected(TabLayout.Tab tab) { change(tab); }
             @Override
-            public void onTabUnselected(TabLayout.Tab tab) {
-                //nop
-            }
+            public void onTabUnselected(TabLayout.Tab tab) { }
             @Override
-            public void onTabReselected(TabLayout.Tab tab) {
-                change(tab);
+            public void onTabReselected(TabLayout.Tab tab) { change(tab); }
+        });
+    }
+
+
+    private void onCreateRecyclerView(View ret_view) {
+        mRecyclerView = ret_view.findViewById(R.id.news_list_recyclerview);
+        mRecyclerView.setLoadingMoreProgressStyle(ProgressStyle.BallPulse);
+        LinearLayoutManager layoutManager = new LinearLayoutManager( getActivity());
+        mRecyclerView.setLayoutManager(layoutManager);
+
+        adapter = new NewsListAdapter();
+        mRecyclerView.setAdapter(adapter);
+
+        Handler mhandler = new EventsListUpdateHandler();
+        NewsUpdater.setHandler(mhandler);
+
+        refresh_callback();
+        mRecyclerView.setLoadingListener(new XRecyclerView.LoadingListener() {
+            @Override
+            public void onRefresh() {
+                if(!view_history && !searching) {
+                    Updater.updatePullUpNews(news_type);
+                }
+                new Handler().postDelayed(() -> {
+                    mRecyclerView.refreshComplete();
+                }, 700);
+            }
+
+            @Override
+            public void onLoadMore() {
+                if(!view_history && !searching) {
+                    Updater.updatePullDownNews(news_type);
+                }
+                new Handler().postDelayed(() -> {
+                    mRecyclerView.refreshComplete();
+                }, 700);
             }
         });
+    }
 
-        ((TabLayout)ret_view.findViewById(R.id.history_tab_layout)).addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
-            @Override
-            public void onTabSelected(TabLayout.Tab tab) {
-                if(tab.getPosition() == 0) {
-                    view_history = false;
-                }
-                if(tab.getPosition() == 1) {
-                    view_history = true;
-                }
-            }
-            @Override
-            public void onTabUnselected(TabLayout.Tab tab) {
-
-            }
-            @Override
-            public void onTabReselected(TabLayout.Tab tab) {
-
-            }
+    private void onCreateSearchEditText(View ret_view) {
+        searchTextView = ret_view.findViewById(R.id.news_list_search_edittext);
+        searchTextView.setOnClickListener(v-> {
+            Navigation.findNavController(v).navigate(R.id.action_view_search_body);
         });
-
-        search_edittext = ret_view.findViewById(R.id.news_list_search_edittext);
-        ((ImageButton)ret_view.findViewById(R.id.search_button))
-                .setOnClickListener(view -> searchUpdate(search_edittext.getText().toString()));
-
-        return ret_view;
-        //RefreshLayout refreshLayout = (RefreshLayout)ret_view.findViewById(R.id.refreshLayout);
-        //refreshLayout.setRefreshHeader(new ClassicsHeader(this.getContext()));
-        //refreshLayout.setRefreshFooter(new ClassicsFooter(this.getContext()));
-        //refreshLayout.setOnRefreshListener(new OnRefreshListener() {
-        //  @Override
-        //public void onRefresh(RefreshLayout refreshlayout) {
-        //  refreshlayout.finishRefresh(2000/*,false*/);//传入false表示刷新失败
-        //}
-        //});
-        //refreshLayout.setOnLoadMoreListener(new OnLoadMoreListener() {
-        // @Override
-        // public void onLoadMore(RefreshLayout refreshlayout) {
-        //     refreshlayout.finishLoadMore(2000/*,false*/);//传入false表示加载失败
-        //  }
-        // });
+        String searchtitle = (String) getArguments().getSerializable("title");
+        if(searchtitle!=null && !searchtitle.equals("")){
+            searchUpdate(searchtitle);
+        }
     }
 
     private void changeType(@NotNull final String eventType) {
@@ -282,6 +263,12 @@ public class main_news_fragment extends Fragment {
     private void refresh_callback() {
         adapter.newslist.clear();
         adapter.newslist.addAll(Updater.getDisplayingNews(news_type));
+        adapter.notifyDataSetChanged();
+    }
+
+    private void refresh_history() {
+        adapter.newslist.clear();
+        adapter.newslist.addAll(Updater.getViewedNews());
         adapter.notifyDataSetChanged();
     }
 
@@ -336,18 +323,15 @@ public class main_news_fragment extends Fragment {
                     // float value in the translationX property.
                 }
             });
-            animation.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-                @Override
-                public void onAnimationUpdate(ValueAnimator updatedAnimation) {
-                    // You can use the animated value in a property that uses the
-                    // same type as the animation. In this case, you can use the
-                    // float value in the translationX property.
-                    int animatedValue = (int)updatedAnimation.getAnimatedValue();
-                    LinearLayout linearLayout = (LinearLayout)tab.view;
-                    LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams) linearLayout.getLayoutParams();
-                    layoutParams.width = animatedValue;
-                    linearLayout.setLayoutParams(layoutParams);
-                }
+            animation.addUpdateListener((ValueAnimator.AnimatorUpdateListener) updatedAnimation -> {
+                // You can use the animated value in a property that uses the
+                // same type as the animation. In this case, you can use the
+                // float value in the translationX property.
+                int animatedValue = (int)updatedAnimation.getAnimatedValue();
+                LinearLayout linearLayout = tab.view;
+                LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams) linearLayout.getLayoutParams();
+                layoutParams.width = animatedValue;
+                linearLayout.setLayoutParams(layoutParams);
             });
         }
         void delete_animation() {
@@ -388,7 +372,7 @@ public class main_news_fragment extends Fragment {
                     // same type as the animation. In this case, you can use the
                     // float value in the translationX property.
                     int animatedValue = (int)updatedAnimation.getAnimatedValue();
-                    LinearLayout linearLayout = (LinearLayout)tab.view;
+                    LinearLayout linearLayout = tab.view;
                     LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams) linearLayout.getLayoutParams();
                     layoutParams.width = animatedValue;
                     linearLayout.setLayoutParams(layoutParams);
@@ -396,59 +380,43 @@ public class main_news_fragment extends Fragment {
             });
         }
     }
+
     static public class NewsClassDialog extends DialogFragment {
         ArrayList selectedItems;
+        @NotNull
         @Override
         public Dialog onCreateDialog(Bundle savedInstanceState) {
-
             from_dialog = true;
             tablayout.selectTab(tablayout.getTabAt(0));
-            final boolean visible_update[] = new boolean[news_class_visible.length];
-            for(int i = 0; i < visible_update.length; i++) {
-                visible_update[i] = news_class_visible[i];
-            }
+            final boolean[] visible_update = new boolean[news_class_visible.length];
+            System.arraycopy(news_class_visible, 0, visible_update, 0, visible_update.length);
             AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
             // Set the dialog title
             builder.setTitle("编辑分类")
                     // Specify the list array, the items to be selected by default (null for none),
                     // and the listener through which to receive callbacks when items are selected
                     .setMultiChoiceItems(news_class_names, visible_update,
-                            new DialogInterface.OnMultiChoiceClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which,
-                                                    boolean isChecked) {
-                                    visible_update[which] = isChecked;
-                                }
-                            })
+                            (dialog, which, isChecked) -> visible_update[which] = isChecked)
                     // Set the action buttons
-                    .setPositiveButton("ok", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int id) {
-                            // User clicked OK, so save the selectedItems results somewhere
-                            // or return them to the component that opened the dialog
-                            long animation_duration = 250;
-                            for(int i = 0; i < visible_update.length; i++) {
-                                if(visible_update[i] != news_class_visible[i]) {
-                                    if(visible_update[i]) {
-                                        main_news_fragment.news_class_handler[i] = new ClassHandler(tablayout.newTab().setText(news_class_names[i]));
-                                        tablayout.addTab(main_news_fragment.news_class_handler[i].tab, 1, false);
-                                        news_class_handler[i].create_animation();
-                                    }else {
-                                        news_class_handler[i].delete_animation();
-                                    }
+                    .setPositiveButton("ok", (dialog, id) -> {
+                        // User clicked OK, so save the selectedItems results somewhere
+                        // or return them to the component that opened the dialog
+                        for(int i = 0; i < visible_update.length; i++) {
+                            if(visible_update[i] != news_class_visible[i]) {
+                                if(visible_update[i]) {
+                                    main_news_fragment.news_class_handler[i] = new ClassHandler(tablayout.newTab().setText(news_class_names[i]));
+                                    tablayout.addTab(main_news_fragment.news_class_handler[i].tab, 1, false);
+                                    news_class_handler[i].create_animation();
+                                }else {
+                                    news_class_handler[i].delete_animation();
                                 }
-                                news_class_visible[i] = visible_update[i];
-                                from_dialog = true;
-                                tablayout.selectTab(tablayout.getTabAt(0));
                             }
+                            news_class_visible[i] = visible_update[i];
+                            from_dialog = true;
+                            tablayout.selectTab(tablayout.getTabAt(0));
                         }
                     })
-                    .setNegativeButton("cancel", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int id) {
-
-                        }
-                    });
+                    .setNegativeButton("cancel", (dialog, id) -> { });
             return builder.create();
         }
     }

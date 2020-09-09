@@ -12,13 +12,30 @@
         <action
             android:id="@+id/action_view_news_body"
             app:destination="@id/news_detail_fragment" />
+        <action
+            android:id="@+id/action_view_search_body"
+            app:destination="@id/search_fragment" />
+        <argument
+            android:name="title"
+            app:argType="string" />
     </fragment>
 
     <fragment
         android:id="@+id/data_main_fragment"
-        android:name="com.example.newsapp.main_news_fragment"
+        android:name="com.example.newsapp.main_data_fragment"
         android:label="fragment_data_main_fragment"
-        tools:layout="@layout/data_main_fragment" />
+        tools:layout="@layout/data_main_fragment" >
+    </fragment>
+
+    <fragment
+        android:id="@+id/search_fragment"
+        android:name="com.example.newsapp.search_fragment"
+        android:label="fragment_search_fragment"
+        tools:layout="@layout/search_fragment" >
+        <action
+            android:id="@+id/action_return_home"
+            app:destination="@id/news_main_fragment" />
+    </fragment>
 
     <fragment
         android:id="@+id/news_detail_fragment"
@@ -29,4 +46,12 @@
             android:name="news"
             app:argType="com.example.newsapp.NewsEntity" />
     </fragment>
+
+    <fragment
+        android:id="@+id/graph_main_fragment"
+        android:name="com.example.newsapp.graph_main_fragment"
+        android:label="fragment_graph_main_fragment"
+        tools:layout="@layout/graph_main_fragment" >
+    </fragment>
+
 </navigation>

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".graph_main_fragment"
+    android:orientation="vertical">
+
+    <SearchView
+        android:id="@+id/search_graph_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:iconifiedByDefault="false"
+        android:queryHint="@string/searchHint" />
+
+    <ExpandableListView
+        android:id="@+id/expandable_graph_list"
+        android:layout_width="match_parent"
+        android:layout_height="675dp"
+        android:layout_gravity="bottom" />
+
+</LinearLayout >
