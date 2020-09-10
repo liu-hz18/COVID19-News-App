@@ -12,11 +12,11 @@ public class NewsApplication extends Application {
 
     @Override
     public void onCreate() {
+        MobSDK.init(this);
         super.onCreate();
         instance = this;
         Thread netThread = new Thread(networkTask);
         netThread.start();
-        MobSDK.init(this);
     }
 
     public static NewsApplication getInstance(){
@@ -48,7 +48,7 @@ public class NewsApplication extends Application {
         //List<SearchEntity> searchResult1 = SearchEntityDataFetcher.fetchSearchEntities("疫情");
         //Log.d("main", searchResult1.toString());
 
-        //ExpertsDataFetcher
+        // ExpertsDataFetcher
         // ExpertsDataFetcher.fetchData(false, false);
         // ExpertsDataFetcher.fetchData(false, true);
         // Log.d("data", Objects.requireNonNull(expertList).toString());

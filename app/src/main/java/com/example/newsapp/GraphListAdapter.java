@@ -29,13 +29,23 @@ public class GraphListAdapter extends BaseExpandableListAdapter {
     public int getGroupCount() { return group_list.size(); }
 
     @Override
-    public int getChildrenCount(int groupPosition) { return group_list.get(groupPosition).getmRelationList().size(); }
+    public int getChildrenCount(int groupPosition) {
+        SearchEntity group_father = group_list.get(groupPosition);
+        return group_father.getmRelationList().size() + group_father.getmPropertyMap().size();
+    }
 
     @Override
     public Object getGroup(int groupPosition) { return group_list.get(groupPosition); }
 
     @Override
-    public Object getChild(int groupPosition, int childPosition) { return group_list.get(groupPosition).getmRelationList().get(childPosition); }
+    public Object getChild(int groupPosition, int childPosition) {
+        SearchEntity group_father = group_list.get(groupPosition);
+        if(childPosition < group_father.getmRelationList().size()) {
+            return group_father.getmRelationList().get(childPosition);
+        } else {
+            return group_father.getmPropertyMap().get(childPosition);
+        }
+    }
 
     @Override
     public long getGroupId(int groupPosition) { return groupPosition; }
@@ -69,14 +79,24 @@ public class GraphListAdapter extends BaseExpandableListAdapter {
         TextView entityLabelView = cardView.findViewById(R.id.entity_label);
         ImageView imageView = cardView.findViewById(R.id.entity_image);
         TextView entityURLView = cardView.findViewById(R.id.entity_url);
-        RelationEntity relationentity = (RelationEntity) getChild(groupPosition, childPosition);
-        entityRelationView.setText(relationentity.mRelation);
-        entityLabelView.setText(relationentity.mLabel);
-        entityURLView.setText("link: " + relationentity.mRelationURL);
-        if(relationentity.isForward)
-            imageView.setImageResource(R.drawable.right_arrow);
-        else
-            imageView.setImageResource(R.drawable.left_arrow);
+
+        SearchEntity group_father = group_list.get(groupPosition);
+        int size = group_father.getmRelationList().size();
+        if(childPosition < size) {
+            RelationEntity relationentity = group_father.getmRelationList().get(childPosition);
+            entityRelationView.setText(relationentity.mRelation);
+            entityLabelView.setText(relationentity.mLabel);
+            entityURLView.setText("link: " + relationentity.mRelationURL);
+            if(relationentity.isForward)
+                imageView.setImageResource(R.drawable.right_arrow);
+            else
+                imageView.setImageResource(R.drawable.left_arrow);
+        } else {
+            Property property = group_father.getmPropertyMap().get(childPosition - size);
+            entityRelationView.setText(property.name);
+            entityLabelView.setText(property.intro);
+            imageView.setImageResource(R.mipmap.right_arrow_little);
+        }
         return cardView;
     }
 

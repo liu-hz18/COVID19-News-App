@@ -152,12 +152,25 @@ class EventsDataFetcher extends BaseDataFetcher {
     private static int topNews = 500;
     private static int topPapers = 200;
     private static boolean updated = false;
-    private static List<NewsEntity> allEventsList = null;
-    private static List<NewsEntity> allNewsList = null;
-    private static List<NewsEntity> allPapersList = null;
+    private static ArrayList<NewsEntity> allEventsList = null;
+    private static ArrayList<NewsEntity> allNewsList = null;
+    private static ArrayList<NewsEntity> allPapersList = null;
 
     private static JSONObject getEventsJsonData() throws IOException {
         return BaseDataFetcher.getJsonData(url);
+    }
+
+    public static void saveEventsList() {
+        Thread newsTask = new Thread(() -> {
+            try {
+                SerializeUtils.write(allNewsList, newsPath);
+                SerializeUtils.write(allPapersList, paperPath);
+            } catch (Exception e) {
+                Log.d("saveEventsList", "save viewed failed");
+                e.printStackTrace();
+            }
+        });
+        newsTask.start();
     }
 
     @NotNull
@@ -216,7 +229,7 @@ class EventsDataFetcher extends BaseDataFetcher {
     }
 
     @Nullable
-    private static List<NewsEntity> fetchDataFromMem(final String dataPath) {
+    private static ArrayList<NewsEntity> fetchDataFromMem(final String dataPath) {
         try{
             return (ArrayList<NewsEntity>) SerializeUtils.read(dataPath);
         } catch (Exception e) {

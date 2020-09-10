@@ -8,18 +8,17 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.SearchView;
-import android.widget.TextView;
-import android.widget.Toast;
 
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.LinkedHashSet;
 
-public class search_fragment extends Fragment{
+public class search_fragment extends Fragment {
+
     private static LinkedHashSet<String> searchHistory = new LinkedHashSet<>();
+    private static String historyPath = BaseDataFetcher.savePath + "search.log";
     private SearchView main_searchview;
     private ListView main_listview;
 
@@ -30,6 +29,14 @@ public class search_fragment extends Fragment{
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Log.d("onCreate", "load history");
+        try {
+            searchHistory = (LinkedHashSet<String>) SerializeUtils.read(historyPath);
+        } catch (Exception e) {
+            searchHistory = new LinkedHashSet<>();
+            Log.d("onCreate", "load history failed");
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -42,6 +49,18 @@ public class search_fragment extends Fragment{
         return ret_view;
     }
 
+    @Override
+    public void onPause() {
+        Log.d("onPause", "save history");
+        try {
+            SerializeUtils.write(searchHistory, historyPath);
+        } catch (Exception e) {
+            Log.d("onPause", "save history failed");
+            e.printStackTrace();
+        }
+        super.onPause();
+    }
+
     private void onCreateSearchView(View ret_view) {
         main_searchview = ret_view.findViewById(R.id.main_searchview);
         main_searchview.setIconifiedByDefault(false);
@@ -49,8 +68,8 @@ public class search_fragment extends Fragment{
         main_searchview.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {//搜索时触发事件
+                Log.d("onQueryTextSubmit", query);
                 searchHistory.add(query);
-                //Toast.makeText(main_searchview.getContext(), "Searching for " + query, Toast.LENGTH_SHORT).show();
                 Bundle bundle = new Bundle();
                 bundle.putSerializable("title", query);
                 Navigation.findNavController(ret_view).navigate(R.id.action_return_home, bundle);

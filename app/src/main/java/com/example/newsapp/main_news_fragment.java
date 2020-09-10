@@ -56,6 +56,11 @@ public class main_news_fragment extends Fragment {
     private String mParam1;
     private String mParam2;
 
+    private static int ALL = 0;
+    private static int NEWS = 1;
+    private static int PAPER = 2;
+    private int newsClass = ALL;
+
     static private String[] news_class_names = {"新闻", "论文"};
     static private boolean[] news_class_visible = {true, true};
     static private TabLayout tablayout;
@@ -63,16 +68,15 @@ public class main_news_fragment extends Fragment {
     static private boolean from_dialog = false;
     static private String pre_tab;
     static private int unfinished_animations = 0;
-    private static int ALL = 0;
-    private static int NEWS = 1;
-    private static int PAPER = 2;
+
     public NewsListAdapter adapter;
     private String news_type = "all";
+
     private boolean view_history = false;
     static boolean searching = false;
+
     private XRecyclerView mRecyclerView;
     private TextView searchTextView;
-    private int newsClass = ALL;
     private TabLayout bottomLayout;
 
     public main_news_fragment() {
@@ -103,7 +107,16 @@ public class main_news_fragment extends Fragment {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
+        Updater.loadViewedFromMem();
     }
+
+    @Override
+    public void onPause() {
+        EventsDataFetcher.saveEventsList();
+        Updater.saveViewedToMem();
+        super.onPause();
+    }
+
     @Override
     public View onCreateView(@NotNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -221,7 +234,7 @@ public class main_news_fragment extends Fragment {
         mRecyclerView.setLoadingMoreProgressStyle(ProgressStyle.BallPulse);
         LinearLayoutManager layoutManager = new LinearLayoutManager( getActivity());
         mRecyclerView.setLayoutManager(layoutManager);
-
+        mRecyclerView.getDefaultRefreshHeaderView().setRefreshTimeVisible(true);
         adapter = new NewsListAdapter();
         mRecyclerView.setAdapter(adapter);
 
@@ -238,7 +251,7 @@ public class main_news_fragment extends Fragment {
                 }
                 new Handler().postDelayed(() -> {
                     mRecyclerView.refreshComplete();
-                }, 700);
+                }, 600);
             }
 
             @Override
@@ -248,7 +261,7 @@ public class main_news_fragment extends Fragment {
                 }
                 new Handler().postDelayed(() -> {
                     mRecyclerView.refreshComplete();
-                }, 700);
+                }, 600);
             }
         });
     }

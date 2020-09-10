@@ -14,7 +14,8 @@ import java.util.Random;
 import java.util.Set;
 
 class Updater {
-    protected static Set<NewsEntity> viewedNews = new LinkedHashSet<>();
+    private static String viewedPath = BaseDataFetcher.savePath + "viewed.log";
+    protected static LinkedHashSet<NewsEntity> viewedNews = new LinkedHashSet<>();
     static int initNumber = 15;
     static int totalUpdateNumber = 7;
     static int relatedUpdateNumber = 5;
@@ -97,6 +98,27 @@ class Updater {
             System.gc();
         });
         newsTask.start();
+    }
+
+    public static void saveViewedToMem() {
+        Thread newsTask = new Thread(() -> {
+            try {
+                SerializeUtils.write(viewedNews, viewedPath);
+            } catch (Exception e) {
+                Log.d("saveViewedToMem", "save history failed");
+                e.printStackTrace();
+            }
+        });
+        newsTask.start();
+    }
+
+    public static void loadViewedFromMem() {
+        try {
+            viewedNews = (LinkedHashSet<NewsEntity>) SerializeUtils.read(viewedPath);
+        } catch (Exception e) {
+            Log.d("loadViewedFromMem", "load viewed failed");
+            e.printStackTrace();
+        }
     }
 
     static Set<NewsEntity> getViewedNews() { return viewedNews; }

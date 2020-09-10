@@ -1,9 +1,12 @@
 package com.example.newsapp;
 
+import android.widget.ListView;
+
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
+import com.jcodecraeer.xrecyclerview.ProgressStyle;
 
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -138,7 +141,7 @@ class NewsEntity extends BaseEntity implements Serializable {
     private String mSource;
     private String mURLSource;
 
-    public transient boolean viewed = false;
+    public boolean viewed = false;
 
     private ArrayList<String> mRelatedNews = new ArrayList<>();
     private ArrayList<String> mTokens = new ArrayList<>();
@@ -241,21 +244,29 @@ class RelationEntity extends BaseEntity implements Serializable {
     }
 }
 
+class Property extends BaseEntity implements Serializable {
+    public String name;
+    public String intro;
+    Property() {}
+    Property(String _name, String _intro) {
+        name = _name;
+        intro = _intro;
+    }
+}
+
+
 class SearchEntity extends BaseEntity implements Serializable {
     private static final String TAG = "SearchEntity";
     private static final long serialVersionUID = -8619878219055489349L;
 
-    public String getmLabel() {
-        return mLabel;
-    }
     @Column(unique = true)
     public String mLabel;   //实体名
     public Double mHotRate;
     public String mURL;
     public String mIntroduction;
     public String mImageURL;
-    public String mPropertyMapJsonStr;
-    public String mRelationListJsonStr;
+    public ArrayList<Property> mProperties = new ArrayList<>();
+    public ArrayList<RelationEntity> mRelationList = new ArrayList<>();
 
     public SearchEntity() { super(); }
 
@@ -276,31 +287,27 @@ class SearchEntity extends BaseEntity implements Serializable {
         this.mURL = url;
         this.mImageURL = imgurl;
         this.mIntroduction = intro;
-        this.mRelationListJsonStr = mRelationListJsonStr;
-        this.mPropertyMapJsonStr = mPropertyMapJsonStr;
     }
     
     private void parseGraphJsonInfo(@NotNull JSONObject graph) {
         JSONObject propertyJSON = graph.getJSONObject("properties");
         if(propertyJSON == null)return;
-        Map<String, String> mPropertyMap = new HashMap<>();
         for(Map.Entry entry: propertyJSON.entrySet()) {
-            mPropertyMap.put((String) entry.getKey(), (String) entry.getValue());
+            mProperties.add(new Property((String) entry.getKey(), (String) entry.getValue()));
         }
-        mPropertyMapJsonStr = JSON.toJSONString(mPropertyMap);
-
-        ArrayList<RelationEntity> mRelationList = new ArrayList<>();
         graph.getJSONArray("relations").forEach(
                 relation -> parseRelationJsonObj((JSONObject) relation, mRelationList));
-        this.mRelationListJsonStr = JSONObject.toJSONString(mRelationList);
     }
 
-    public Map<String, Object> getmPropertyMap() {
-        return JSONObject.parseObject(this.mPropertyMapJsonStr);
+    public String getmLabel() { return mLabel; }
+
+    public List<Property> getmPropertyMap() {
+        return this.mProperties;
     }
 
     public List<RelationEntity> getmRelationList() {
-        return JSON.parseObject(this.mRelationListJsonStr, new TypeReference<ArrayList<RelationEntity>>(){});
+        //return JSON.parseObject(this.mRelationListJsonStr, new TypeReference<ArrayList<RelationEntity>>(){});
+        return this.mRelationList;
     }
 
     private void parseRelationJsonObj(@NotNull JSONObject relationObj, @NotNull List<RelationEntity> mRelationList){
