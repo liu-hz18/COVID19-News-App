@@ -21,6 +21,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -358,33 +359,49 @@ class SearchEntityDataFetcher extends BaseDataFetcher {
 class ExpertsDataFetcher extends BaseDataFetcher {
     private static final String TAG = "ExpertsDataFetcher";
     private final static String url = "https://innovaapi.aminer.cn/predictor/api/v1/valhalla/highlight/get_ncov_expers_list?v=2";
-    private static String dataPath = savePath + "experts.data";
+    private static String dataAlivePath = savePath + "expertsAlive.data";
+    private static String dataPassedPath = savePath + "expertsPassed.data";
     public static int UPDATE_EXPERTS = 0x4;
+    private static Handler mHandler;
 
-    private static JSONObject getExpertsJsonData() throws IOException {
-        return BaseDataFetcher.getJsonData(url);
+    private static JSONObject getExpertsJsonData(){
+        try{
+            return BaseDataFetcher.getJsonData(url);
+        }  catch (IOException e) {
+            return null;
+        }
+    }
+
+    public static void setHandler(Handler handler) {
+        mHandler = handler;
     }
 
     @NotNull
-    private static List<ExpertEntity> fetchDataFromNet() throws IOException {
-        ArrayList<ExpertEntity> expertList = new ArrayList<>();
+    private static void fetchDataFromNet() {
+        ArrayList<ExpertEntity> expertAliveList = new ArrayList<>();
+        ArrayList<ExpertEntity> expertPassedList = new ArrayList<>();
         JSONObject experts = getExpertsJsonData();
         if(experts != null) {
             JSONArray expertsArr = experts.getJSONArray("data");
-            expertsArr.parallelStream().forEach(expertJson->parseExpertJsonObj((JSONObject) expertJson, expertList));
+            expertsArr.parallelStream().forEach(expertJson -> parseExpertJsonObj((JSONObject) expertJson, expertAliveList, expertPassedList));
         }
+        Collections.sort(expertAliveList, (left, right) -> (right.mCitations.compareTo(left.mCitations)));
+        Collections.sort(expertPassedList, (left, right) -> (right.mCitations.compareTo(left.mCitations)));
         try{
-            SerializeUtils.write(expertList, dataPath);
+            SerializeUtils.write(expertAliveList, dataAlivePath);
+            SerializeUtils.write(expertPassedList, dataPassedPath);
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return expertList;
     }
 
     @Nullable
-    private static List<ExpertEntity> fetchDataFromMem() {
+    private static List<ExpertEntity> fetchDataFromMem(boolean passed) {
         try{
-            return (ArrayList<ExpertEntity>) SerializeUtils.read(dataPath);
+            if(passed)
+                return (ArrayList<ExpertEntity>) SerializeUtils.read(dataPassedPath);
+            else
+                return (ArrayList<ExpertEntity>) SerializeUtils.read(dataAlivePath);
         } catch (Exception e) {
             e.printStackTrace();
             return null;
@@ -392,19 +409,20 @@ class ExpertsDataFetcher extends BaseDataFetcher {
     }
 
     @Nullable
-    public static List<ExpertEntity> fetchData(boolean update) {
-        if(update) {
-            try{
-                return fetchDataFromNet();
-            } catch (IOException e) {
-                e.printStackTrace();
-                return null;
+    public static void fetchData(boolean update, boolean passed) {
+        Thread newsTask = new Thread(() -> {
+            Message msg = Message.obtain(); // 实例化消息对象
+            if(update) {
+                fetchDataFromNet();
             }
-        }
-        return fetchDataFromMem();
+            msg.obj = fetchDataFromMem(passed);
+            msg.what = UPDATE_EXPERTS; // 消息标识
+            if(mHandler != null) mHandler.sendMessage(msg);
+        });
+        newsTask.start();
     }
 
-    private static void parseExpertJsonObj(@NotNull JSONObject expertJson, @NotNull List<ExpertEntity> expertList) {
+    private static void parseExpertJsonObj(@NotNull JSONObject expertJson, @NotNull List<ExpertEntity> expertAliveList, @NotNull List<ExpertEntity> expertPassedList) {
         ExpertEntity expert = new ExpertEntity(expertJson.getString("id"));
         expert.mImgURL = expertJson.getString("avatar");
         expert.mEnName = expertJson.getString("name");
@@ -431,8 +449,17 @@ class ExpertsDataFetcher extends BaseDataFetcher {
         expert.mSociability = indices.getDouble("sociability");
         expert.mPublication = indices.getInteger("pubs");
         synchronized (ExpertsDataFetcher.class){
-            expertList.add(expert);
-            //expert.save();
+            if(expert.hasPassedAway) {
+                for(ExpertEntity entity: expertPassedList){
+                    if(entity.mEnName.equals(expert.mEnName))return;
+                }
+                expertPassedList.add(expert);
+            } else {
+                for(ExpertEntity entity: expertAliveList){
+                    if(entity.mEnName.equals(expert.mEnName))return;
+                }
+                expertAliveList.add(expert);
+            }
         }
     }
 }

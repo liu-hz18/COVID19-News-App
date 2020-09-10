@@ -54,4 +54,25 @@
         tools:layout="@layout/graph_main_fragment" >
     </fragment>
 
+    <fragment
+        android:id="@+id/expert_main_fragment"
+        android:name="com.example.newsapp.main_expert_fragment"
+        android:label="fragment_expert_main_fragment"
+        tools:layout="@layout/expert_main_fragment" >
+        <action
+            android:id="@+id/action_view_expert_body"
+            app:destination="@id/expert_detail_fragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/expert_detail_fragment"
+        android:name="com.example.newsapp.expert_detail_fragment"
+        android:label="expert_body_fragment"
+        tools:layout="@layout/expert_detail_fragment" >
+        <argument
+            android:name="expert"
+            app:argType="com.example.newsapp.ExpertEntity" />
+    </fragment>
+
+
 </navigation>

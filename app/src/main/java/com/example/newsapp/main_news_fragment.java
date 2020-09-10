@@ -63,12 +63,17 @@ public class main_news_fragment extends Fragment {
     static private boolean from_dialog = false;
     static private String pre_tab;
     static private int unfinished_animations = 0;
+    private static int ALL = 0;
+    private static int NEWS = 1;
+    private static int PAPER = 2;
     public NewsListAdapter adapter;
     private String news_type = "all";
     private boolean view_history = false;
     static boolean searching = false;
     private XRecyclerView mRecyclerView;
     private TextView searchTextView;
+    private int newsClass = ALL;
+    private TabLayout bottomLayout;
 
     public main_news_fragment() {
         // Required empty public constructor
@@ -98,7 +103,6 @@ public class main_news_fragment extends Fragment {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
-
     }
     @Override
     public View onCreateView(@NotNull LayoutInflater inflater, ViewGroup container,
@@ -114,7 +118,10 @@ public class main_news_fragment extends Fragment {
     }
 
     private void onCreateBottomTabLayout(View ret_view) {
-        ((TabLayout)ret_view.findViewById(R.id.history_tab_layout)).addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+        bottomLayout = ret_view.findViewById(R.id.history_tab_layout);
+        if(view_history) bottomLayout.getTabAt(1).select();
+        else bottomLayout.getTabAt(0).select();
+        bottomLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
                 if (tab.getPosition() == 1) {
@@ -128,7 +135,15 @@ public class main_news_fragment extends Fragment {
             @Override
             public void onTabUnselected(TabLayout.Tab tab) { }
             @Override
-            public void onTabReselected(TabLayout.Tab tab) { }
+            public void onTabReselected(TabLayout.Tab tab) {
+                if (tab.getPosition() == 1) {
+                    view_history = true;
+                    refresh_history();
+                } else {
+                    view_history = false;
+                    changeType(news_type);
+                }
+            }
         });
     }
 
@@ -156,32 +171,39 @@ public class main_news_fragment extends Fragment {
         layoutParams = (LinearLayout.LayoutParams) linearLayout.getLayoutParams();
         layoutParams.width = 100;
         linearLayout.setLayoutParams(layoutParams);
-
+        tablayout.getTabAt(newsClass).select();
         tablayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             void change(TabLayout.Tab tab) {
                 if(from_dialog) {
                     from_dialog = false;
                     return;
                 }
-                if(!view_history) {
-                    CharSequence text = tab.getText();
-                    pre_tab = text.toString();
-                    if ("全部".contentEquals(text)) {
-                        news_type = "all";
-                        searching = false;
-                        changeType(news_type);
-                    } else if ("新闻".contentEquals(text)) {
-                        news_type = "news";
-                        searching = false;
-                        changeType(news_type);
-                    } else if ("论文".contentEquals(text)) {
-                        news_type = "paper";
-                        searching = false;
-                        changeType(news_type);
-                    } else if ("+".contentEquals(text)) {
-                        NewsClassDialog dialog = new NewsClassDialog();
-                        dialog.show(getActivity().getSupportFragmentManager(), "choose_class_dialog");
-                    }
+                ((TabLayout)ret_view.findViewById(R.id.history_tab_layout)).getTabAt(0).select();
+                CharSequence text = tab.getText();
+                pre_tab = text.toString();
+                if ("全部".contentEquals(text)) {
+                    newsClass = ALL;
+                    news_type = "all";
+                    searching = false;
+                    view_history = false;
+                    changeType(news_type);
+                } else if ("新闻".contentEquals(text)) {
+                    newsClass = NEWS;
+                    news_type = "news";
+                    searching = false;
+                    view_history = false;
+                    changeType(news_type);
+                } else if ("论文".contentEquals(text)) {
+                    newsClass = PAPER;
+                    news_type = "paper";
+                    searching = false;
+                    view_history = false;
+                    changeType(news_type);
+                } else if ("+".contentEquals(text)) {
+                    searching = false;
+                    view_history = false;
+                    NewsClassDialog dialog = new NewsClassDialog();
+                    dialog.show(getActivity().getSupportFragmentManager(), "choose_class_dialog");
                 }
             }
             @Override
@@ -206,7 +228,8 @@ public class main_news_fragment extends Fragment {
         Handler mhandler = new EventsListUpdateHandler();
         NewsUpdater.setHandler(mhandler);
 
-        refresh_callback();
+        if(view_history) refresh_history();
+        else refresh_callback();
         mRecyclerView.setLoadingListener(new XRecyclerView.LoadingListener() {
             @Override
             public void onRefresh() {

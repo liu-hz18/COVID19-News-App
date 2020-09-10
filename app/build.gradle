@@ -1,4 +1,5 @@
 apply plugin: 'com.android.application'
+apply plugin: 'com.mob.sdk'
 
 android {
     compileSdkVersion 30
@@ -63,9 +64,68 @@ dependencies {
     implementation 'com.github.PhilJay:MPAndroidChart:v3.0.3'
     implementation 'com.carson_ho:SearchLayout:1.0.1'
     implementation 'com.jcodecraeer:xrecyclerview:1.6.0'
+
 }
 
 configurations {
     cleanedAnnotations
     compile.exclude group: 'org.jetbrains' , module:'annotations'
+}
+
+MobSDK {
+    appKey "30c1f0281cfba"
+    appSecret "781ffc2ef3fd04dc0c6503cd8bd012d8"
+    ShareSDK {
+        loopShare true
+        devInfo {
+            SinaWeibo {
+                appKey "568898243"
+                appSecret "38a4f8204cc784f81f9f0daaf31e02e3"
+                callbackUri "http://www.sharesdk.cn"
+            }
+            Wechat {
+                appId "wx4868b35061f87885"
+                appSecret "64020361b8ec4c99936c0e3999a9f249"
+                userName "gh_afb25ac019c9"
+                path "pages/index/index.html?id=1"
+                withShareTicket true
+                miniprogramType 2
+            }
+            QQ {
+                appId "100371282"
+                appKey "aed9b0303e3ed1e27bae87c33761161d"
+            }
+            ShortMessage {
+                enable true
+            }
+            Douyin {
+                appKey "aw9ivykfjvi4hpwo"
+                appSecret "42b4caa6bda60bd49f05f06d0a4956e1"
+            }
+            FacebookMessenger {
+                appId "107704292745179"
+            }
+            Email {
+                enable true
+            }
+            Wework {
+                appKey "wwa21eaecf93f0e3ba"
+                appSecret "dW7e27P7Hc8NiYdRxnbTeOLgfI1ugR72e-PM8uusq2s"
+                agentId "1000012"
+                schema "wwautha21eaecf93f0e3ba000012"
+            }
+            WechatMoments {
+                appId "wx4868b35061f87885"
+                appSecret "64020361b8ec4c99936c0e3999a9f249"
+            }
+            WechatFavorite {
+                appId "wx4868b35061f87885"
+                appSecret "64020361b8ec4c99936c0e3999a9f249"
+            }
+            QZone {
+                appId "100371282"
+                appKey "aed9b0303e3ed1e27bae87c33761161d"
+            }
+        }
+    }
 }

@@ -11,13 +11,14 @@
         android:background="@color/appBarLayoutBgColor"
         android:minHeight="?attr/actionBarSize"
         android:theme="?attr/actionBarTheme"
+        android:text="COVID News"
         android:textSize="20sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:menu="@menu/main_appbar_menu"
-        app:title="@string/hello_blank_fragment" />
+        app:title="COVID News" />
 
     <fragment
         android:id="@+id/main_fragment_host"

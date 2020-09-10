@@ -4,10 +4,19 @@
     package="com.example.newsapp">
     <uses-permission android:name="android.permission.INTERNET"
         tools:ignore="ManifestOrder" />
+    <uses-permission android:name="android.permission.GET_"/>
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
+    <uses-permission android:name="android.permission.MANAGE_ACCOUNTS"/>
+    <uses-permission android:name="android.permission.GET_ACCOUNTS"/>
     <!--add these under application if you have low disk space-->
     <!--android:largeHeap="true"-->
     <!--android:hardwareAccelerated="false"-->
     <application
+        android:name=".NewsApplication"
         android:allowBackup="true"
         android:largeHeap="true"
         android:hardwareAccelerated="false"

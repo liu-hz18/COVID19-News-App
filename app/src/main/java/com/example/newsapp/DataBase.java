@@ -19,11 +19,6 @@ import java.util.List;
 //加载数据
 class DataLoader {
     @NotNull
-    public static List<NewsEntity> loadRelatedNews(@NotNull List<String> newsList) {
-        return loadNewsList(newsList);
-    }
-
-    @NotNull
     public static List<NewsEntity> loadNewsList(@NotNull List<String> newsList) { //O(nlogn+klogn)
         List<NewsEntity> related = new ArrayList<>();
         List<NewsEntity> allNewsList = EventsDataFetcher.fetchAllData(false);
@@ -36,38 +31,4 @@ class DataLoader {
         }
         return related;
     }
-
-    public static List<ExpertEntity> loadExpertsDataList() {
-        return ExpertsDataFetcher.fetchData(false);
-    }
-
-    @Nullable
-    public static ExpertEntity loadExpertData(final String name) {
-        List<ExpertEntity> experts = ExpertsDataFetcher.fetchData(false);
-        for(ExpertEntity expert: experts) {
-            if(expert.mZhName.equals(name) || expert.mEnName.equals(name)) {
-                return expert;
-            }
-        }
-        return null;
-    }
-
-    @NotNull
-    public static void loadSearchResult(final String keyword) {
-        SearchEntityDataFetcher.fetchSearchEntities(keyword);
-    }
-
-    @NotNull
-    public static List<CountryEpidemicEntity> loadCountryEpidemicDataList() {
-        List<CountryEpidemicEntity> countryData = EpidemicDataFetcher.fetchCountryData(false);
-        return countryData;
-    }
-
-    public static List<ChinaProvinceEpidemicEntity> loadChinaProvinceEpidemicData() {
-        List<ChinaProvinceEpidemicEntity> china = EpidemicDataFetcher.fetchChinaData(false);
-        Collections.sort(china, (left, right) -> (left.mConfirmed - right.mConfirmed));
-        return china;
-    }
 }
-
-
