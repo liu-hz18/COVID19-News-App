@@ -26,7 +26,7 @@ import com.google.android.material.tabs.TabLayout;
 import java.util.ArrayList;
 import java.util.Objects;
 
-import com.jcodecraeer.xrecyclerview.ProgressStyle;
+import android.widget.ProgressBar;
 import com.jcodecraeer.xrecyclerview.XRecyclerView;
 
 
@@ -58,7 +58,7 @@ public class main_news_fragment extends Fragment {
     private static int ALL = 0;
     private static int NEWS = 1;
     private static int PAPER = 2;
-    private int newsClass = ALL;
+    private static int newsClass = ALL;
 
     static private String[] news_class_names = {"新闻", "论文"};
     static private boolean[] news_class_visible = {true, true};
@@ -76,6 +76,8 @@ public class main_news_fragment extends Fragment {
     private XRecyclerView mRecyclerView;
     private TextView searchTextView;
     private TabLayout bottomLayout;
+
+    static private ProgressBar progressbar;
 
     public main_news_fragment() {
         // Required empty public constructor
@@ -121,6 +123,7 @@ public class main_news_fragment extends Fragment {
         // Inflate the layout for this fragment
         View ret_view = inflater.inflate(R.layout.news_main_fragment, container, false);
         pre_tab = "全部";
+        progressbar = ret_view.findViewById(R.id.progressBar);
         onCreateRecyclerView(ret_view);
         onCreateHeaderTabLayout(ret_view);
         onCreateBottomTabLayout(ret_view);
@@ -215,6 +218,7 @@ public class main_news_fragment extends Fragment {
                     NewsApplication.searching = false;
                     view_history = false;
                     NewsClassDialog dialog = new NewsClassDialog();
+                    progressbar.setVisibility(View.VISIBLE);
                     dialog.show(getActivity().getSupportFragmentManager(), "choose_class_dialog");
                 }
             }
@@ -300,6 +304,7 @@ public class main_news_fragment extends Fragment {
     }
 
     private void refresh_callback() {
+        progressbar.setVisibility(View.GONE);
         adapter.newslist.clear();
         adapter.newslist.addAll(Updater.getDisplayingNews(news_type));
         adapter.notifyDataSetChanged();
@@ -342,6 +347,7 @@ public class main_news_fragment extends Fragment {
                     // same type as the animation. In this case, you can use the
                     // float value in the translationX property.
                     check_all_end();
+                    progressbar.setVisibility(View.GONE);
                 }
                 @Override
                 public void onAnimationCancel(Animator updatedAnimation) {
@@ -362,7 +368,7 @@ public class main_news_fragment extends Fragment {
                     // float value in the translationX property.
                 }
             });
-            animation.addUpdateListener((ValueAnimator.AnimatorUpdateListener) updatedAnimation -> {
+            animation.addUpdateListener(updatedAnimation -> {
                 // You can use the animated value in a property that uses the
                 // same type as the animation. In this case, you can use the
                 // float value in the translationX property.
@@ -384,6 +390,7 @@ public class main_news_fragment extends Fragment {
                     unfinished_animations --;
                     tablayout.removeTab(tab);
                     check_all_end();
+                    progressbar.setVisibility(View.GONE);
                 }
                 @Override
                 public void onAnimationCancel(Animator updatedAnimation) {

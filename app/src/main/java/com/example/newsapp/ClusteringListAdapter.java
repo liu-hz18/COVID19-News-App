@@ -51,7 +51,6 @@ public class ClusteringListAdapter extends RecyclerView.Adapter<ClusteringListAd
     @SuppressLint("ResourceAsColor")
     @Override
     public void onBindViewHolder(ClusteringListViewHolder holder, int position) {
-        Log.d("position", String.valueOf(position));
         TextView eventTextView = holder.layout.findViewById(R.id.event_title);
         TextView eventSourceView = holder.layout.findViewById(R.id.event_source);
         EventClusterEntity event = eventlist.get(position);

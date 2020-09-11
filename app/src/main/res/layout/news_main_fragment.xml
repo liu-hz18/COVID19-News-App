@@ -11,6 +11,17 @@
         android:layout_height="match_parent"
         tools:context=".MainActivity">
 
+        <ProgressBar
+            android:id="@+id/progressBar"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:indeterminate="true"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/news_tab_layout" />
+
+
         <com.jcodecraeer.xrecyclerview.XRecyclerView
             android:id="@+id/news_list_recyclerview"
             android:layout_width="0dp"
@@ -20,7 +31,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/news_tab_layout"
+            app:layout_constraintTop_toBottomOf="@+id/progressBar"
             app:layout_constraintVertical_bias="1.0"
             tools:ignore="UnknownId"
             android:background="@color/tableBgColor"/>
