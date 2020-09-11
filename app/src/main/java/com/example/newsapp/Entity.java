@@ -109,11 +109,11 @@ class ChinaProvinceEpidemicEntity extends EpidemicEntity implements Serializable
     public ChinaProvinceEpidemicEntity() { super(); }
 
     public ChinaProvinceEpidemicEntity(final String province, final String begin, final int confirmed, final int suspected, final int cured, final int dead) {
-        super(province, begin, confirmed, suspected, cured, dead);
+        super(province.replace("China|", ""), begin, confirmed, suspected, cured, dead);
     }
 
     public ChinaProvinceEpidemicEntity(final String province, final String begin, @NotNull final List<Integer> numbers) {
-        this(province, begin, numbers.get(0), numbers.get(1), numbers.get(2), numbers.get(3));
+        this(province.replace("China|", ""), begin, numbers.get(0), numbers.get(1), numbers.get(2), numbers.get(3));
     }
 }
 
@@ -153,7 +153,7 @@ class NewsEntity extends BaseEntity implements Serializable {
     public String getTime() { return mTime; }
     public String getmTitle() { return mTitle; }
     public String getmContent() { return mContent; }
-    public String getmSource() { return "来源:" + mSource; }
+    public String getmSource() { return mSource; }
     public String getmURLSource() { return mURLSource; }
 
     @NotNull
@@ -215,8 +215,26 @@ class NewsEntity extends BaseEntity implements Serializable {
                     jsonObj -> mRelatedNews.add(((JSONObject)jsonObj).getString("id")));
         }
     }
-
 }
+
+class EventClusterEntity extends BaseEntity implements Serializable {
+    private static final long serialVersionUID = 3621605718658283537L;
+    public String id;
+    public String title;
+    public String date;
+    public EventClusterEntity() { super(); }
+    public EventClusterEntity(final String _id, final String _title, final String _date) {
+        id = _id;
+        title = _title;
+        date = _date;
+    }
+    @Override
+    public String toString() {
+        return id + " | " + title + " | " + date;
+    }
+}
+
+
 
 class RelationEntity extends BaseEntity implements Serializable {
     private static final String TAG = "RelationEntity";

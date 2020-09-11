@@ -1,10 +1,7 @@
 package com.example.newsapp;
 
-import android.graphics.Color;
 import android.graphics.Matrix;
 import com.github.mikephil.charting.charts.BarChart;
-import com.github.mikephil.charting.components.Legend;
-import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.data.BarData;
 
 import org.jetbrains.annotations.NotNull;
@@ -18,6 +15,8 @@ public class BarCharts {
     public void showBarChart(@NotNull BarChart barChart, BarData barData, boolean isSlither) {
         // 设置是否可以触摸
         barChart.setTouchEnabled(isSlither);
+        barChart.getDescription().setEnabled(false);
+        barChart.getAxisRight().setEnabled(false);
         // 是否可以拖拽
         barChart.setDragEnabled(isSlither);//放大可拖拽
         // 是否可以缩放

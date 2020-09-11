@@ -12,18 +12,24 @@ import com.alibaba.fastjson.JSONObject;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.litepal.LitePal;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.Serializable;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 
 
@@ -80,7 +86,7 @@ class EpidemicDataFetcher extends BaseDataFetcher {
             }
         }
         try{
-            Log.d("after read", countryDataList.get(0).toString());
+            //Log.d("after read", countryDataList.get(0).toString());
             SerializeUtils.write(countryDataList, worldDataPath);
             SerializeUtils.write(chinaDataList, chinaDataPath);
         } catch (Exception e) {
@@ -149,8 +155,8 @@ class EventsDataFetcher extends BaseDataFetcher {
     private final static String url = "https://covid-dashboard.aminer.cn/api/dist/events.json";
     private static String paperPath = savePath + "paper.data";
     private static String newsPath = savePath + "news.data";
-    private static int topNews = 500;
-    private static int topPapers = 200;
+    private static int topNews = 600;
+    private static int topPapers = 400;
     private static boolean updated = false;
     private static ArrayList<NewsEntity> allEventsList = null;
     private static ArrayList<NewsEntity> allNewsList = null;
@@ -166,7 +172,7 @@ class EventsDataFetcher extends BaseDataFetcher {
                 SerializeUtils.write(allNewsList, newsPath);
                 SerializeUtils.write(allPapersList, paperPath);
             } catch (Exception e) {
-                Log.d("saveEventsList", "save viewed failed");
+                //Log.d("saveEventsList", "save viewed failed");
                 e.printStackTrace();
             }
         });
@@ -255,7 +261,7 @@ class EventsDataFetcher extends BaseDataFetcher {
     public static List<NewsEntity> fetchAllData(final boolean update) {
         if(update) { update(); }
         if(allEventsList != null) return allEventsList;
-        Log.d("update", "load from disk");
+        //Log.d("update", "load from disk");
         ArrayList<NewsEntity> allList = new ArrayList<>();
         List<NewsEntity> temp;
         if((temp = fetchNewsData(false)) != null)allList.addAll(temp);
@@ -315,7 +321,7 @@ class SearchEntityDataFetcher extends BaseDataFetcher {
             entityJson = SearchEntityDataFetcher.getSearchEntityJsonData(keyword);
         } catch (IOException e) {
             e.printStackTrace();
-            Log.d("SearchEntityDataFetcher", "not found!");
+            // Log.d("SearchEntityDataFetcher", "not found!");
             return null;
         }
         if (entityJson != null && entityJson.getJSONArray("data").size() > 0) {
@@ -473,6 +479,136 @@ class ExpertsDataFetcher extends BaseDataFetcher {
                 }
                 expertAliveList.add(expert);
             }
+        }
+    }
+}
+
+class EventsClusterDataFetcher extends BaseDataFetcher {
+    private static String savePath1 = BaseDataFetcher.savePath + "cluster1.data";
+    private static String savePath2 = BaseDataFetcher.savePath + "cluster2.data";
+    private static String savePath3 = BaseDataFetcher.savePath + "cluster3.data";
+    private static String savePath4 = BaseDataFetcher.savePath + "cluster4.data";
+    private static String savePath5 = BaseDataFetcher.savePath + "cluster5.data";
+    public static ArrayList<EventClusterEntity> cluster1 = new ArrayList<>();
+    public static ArrayList<EventClusterEntity> cluster2 = new ArrayList<>();
+    public static ArrayList<EventClusterEntity> cluster3 = new ArrayList<>();
+    public static ArrayList<EventClusterEntity> cluster4 = new ArrayList<>();
+    public static ArrayList<EventClusterEntity> cluster5 = new ArrayList<>();
+
+    public static void fetchDataFromJson(final String jsonPath, boolean update) {
+        if(!update)return;
+        InputStream is = EventsClusterDataFetcher.class.getClassLoader().getResourceAsStream("assets/"+jsonPath);
+        StringBuilder total = new StringBuilder();
+        try{
+            BufferedReader json_in = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8));
+            String input_json;
+            while((input_json = json_in.readLine()) != null) {
+                total.append(input_json);
+            }
+            json_in.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+            Log.d("fetchDataFromJson", "read from json file filed!");
+        }
+        ExecutorService cachedThreadPool = Executors.newCachedThreadPool();
+        JSONObject jsonObj = JSON.parseObject(total.toString());
+        JSONArray c1 = jsonObj.getJSONArray("传染与预防");
+        JSONArray c2 = jsonObj.getJSONArray("病毒溯源");
+        JSONArray c3 = jsonObj.getJSONArray("疫苗研发");
+        JSONArray c4 = jsonObj.getJSONArray("检测诊断");
+        JSONArray c5 = jsonObj.getJSONArray("药物研发");
+        cachedThreadPool.execute(()-> {
+            c1.forEach(event -> cluster1.add(new EventClusterEntity(
+                    ((JSONObject)event).getString("_id"),
+                    ((JSONObject)event).getString("title"),
+                    ((JSONObject)event).getString("time")))
+            );
+            try {
+                SerializeUtils.write(cluster1, savePath1);
+                Log.d("fetchDataFromJson", "save cluster1 success");
+                Log.d("fetchDataFromJson", cluster1.toString());
+            } catch (Exception e) {
+                Log.d("fetchDataFromJson", "save cluster1 failed");
+                e.printStackTrace();
+            }
+        });
+        cachedThreadPool.execute(()-> {
+            c2.forEach(event -> cluster2.add(new EventClusterEntity(
+                    ((JSONObject)event).getString("_id"),
+                    ((JSONObject)event).getString("title"),
+                    ((JSONObject)event).getString("time")))
+            );
+            try {
+                SerializeUtils.write(cluster2, savePath2);
+            } catch (Exception e) {
+                Log.d("fetchDataFromJson", "save cluster2 failed");
+                e.printStackTrace();
+            }
+        });
+        cachedThreadPool.execute(()-> {
+            c3.forEach(event -> cluster3.add(new EventClusterEntity(
+                    ((JSONObject)event).getString("_id"),
+                    ((JSONObject)event).getString("title"),
+                    ((JSONObject)event).getString("time")))
+            );
+            try {
+                SerializeUtils.write(cluster3, savePath3);
+            } catch (Exception e) {
+                Log.d("fetchDataFromJson", "save cluster3 failed");
+                e.printStackTrace();
+            }
+        });
+        cachedThreadPool.execute(()-> {
+            c4.forEach(event -> cluster4.add(new EventClusterEntity(
+                    ((JSONObject)event).getString("_id"),
+                    ((JSONObject)event).getString("title"),
+                    ((JSONObject)event).getString("time")))
+            );
+            try {
+                SerializeUtils.write(cluster4, savePath4);
+            } catch (Exception e) {
+                Log.d("fetchDataFromJson", "save cluster4 failed");
+                e.printStackTrace();
+            }
+        });
+        cachedThreadPool.execute(()-> {
+            c5.forEach(event -> cluster5.add(new EventClusterEntity(
+                    ((JSONObject)event).getString("_id"),
+                    ((JSONObject)event).getString("title"),
+                    ((JSONObject)event).getString("time")))
+            );
+            try {
+                SerializeUtils.write(cluster5, savePath5);
+            } catch (Exception e) {
+                Log.d("fetchDataFromJson", "save cluster5 failed");
+                e.printStackTrace();
+            }
+        });
+    }
+
+    public static ArrayList<EventClusterEntity> fetchDataFromMem(final int cluster) {
+        try {
+            switch (cluster) {
+                case 0:
+                    if(cluster1 == null || cluster1.size() < 1)cluster1 = (ArrayList<EventClusterEntity>) SerializeUtils.read(savePath1);
+                    return cluster1;
+                case 1:
+                    if(cluster2 == null || cluster2.size() < 1)cluster2 = (ArrayList<EventClusterEntity>) SerializeUtils.read(savePath2);
+                    return cluster2;
+                case 2:
+                    if(cluster3 == null || cluster3.size() < 1)cluster3 = (ArrayList<EventClusterEntity>) SerializeUtils.read(savePath3);
+                    return cluster3;
+                case 3:
+                    if(cluster4 == null || cluster4.size() < 1)cluster4 = (ArrayList<EventClusterEntity>) SerializeUtils.read(savePath4);
+                    return cluster4;
+                default:
+                    if(cluster5 == null || cluster5.size() < 1)cluster5 = (ArrayList<EventClusterEntity>) SerializeUtils.read(savePath5);
+                    return cluster5;
+            }
+        } catch (Exception e) {
+            Log.d("fetchDataFromMem", "load cluster file failed!");
+            e.printStackTrace();
+            return null;
         }
     }
 }

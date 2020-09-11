@@ -65,7 +65,7 @@ public class graph_main_fragment extends Fragment implements View.OnClickListene
             @Override
             public void handleMessage(@NotNull Message msg) {
                 if (msg.what == SearchEntityDataFetcher.UPDATE_GRAPH_ENTITY) {
-                    Log.d(TAG, "handleMessage: graph call complete");
+                    // Log.d(TAG, "handleMessage: graph call complete");
                     adapter.group_list.clear();
                     List<SearchEntity> result = SearchEntityDataFetcher.getSearchResult();
                     if(result != null) adapter.group_list.addAll(result);
@@ -85,7 +85,7 @@ public class graph_main_fragment extends Fragment implements View.OnClickListene
         mSearchView = ret_view.findViewById(R.id.search_graph_view);
 
         //mSearchView.setIconifiedByDefault(false);
-        mSearchView.setQueryHint("Type keywords you want to query");
+        mSearchView.setQueryHint("Type and enjoy searching");
 
         mSearchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
@@ -108,7 +108,7 @@ public class graph_main_fragment extends Fragment implements View.OnClickListene
 
     @Override
     public void onClick(View view) {
-        Log.d(TAG, "onClick: button");
+        //Log.d(TAG, "onClick: button");
     }
 }
 

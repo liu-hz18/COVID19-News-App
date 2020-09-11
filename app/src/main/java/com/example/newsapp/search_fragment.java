@@ -73,8 +73,8 @@ public class search_fragment extends Fragment {
                 Bundle bundle = new Bundle();
                 bundle.putSerializable("title", query);
                 Navigation.findNavController(ret_view).navigate(R.id.action_return_home, bundle);
-                main_news_fragment.searching = true;
-                return false;
+                NewsApplication.searching = true;
+                return true;
             }
             @Override
             public boolean onQueryTextChange(String newText) {//搜索时根据文本框动态改变搜索内容

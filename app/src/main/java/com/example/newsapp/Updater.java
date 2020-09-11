@@ -38,7 +38,7 @@ class Updater {
     static void setHandler(Handler handler) { mHandler = handler; }
 
     static List<NewsEntity> fetchData(@NotNull final String eventType) {
-        Log.d("fetch", eventType);
+        //Log.d("fetch", eventType);
         switch (eventType) {
             case "news":
                 return EventsDataFetcher.fetchNewsData(false);
@@ -56,7 +56,7 @@ class Updater {
     }
 
     static void updatePullUpNews(final String type) {
-        Log.d("pullup", type);
+        //Log.d("pullup", type);
         switch (type) {
             case "news":
                 NewsUpdater.updatePullUpNews();
@@ -68,7 +68,7 @@ class Updater {
     }
 
     static void updatePullDownNews(final String type) {
-        Log.d("pulldown", type);
+        //Log.d("pulldown", type);
         switch (type) {
             case "news":
                 NewsUpdater.updatePullDownNews();
@@ -80,7 +80,7 @@ class Updater {
     }
 
     static List<NewsEntity> getDisplayingNews (final String type) {
-        Log.d("display", type);
+        //Log.d("display", type);
         switch (type) {
             case "news":
                 return NewsUpdater.getDisplayingNews();

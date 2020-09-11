@@ -2,25 +2,34 @@ package com.example.newsapp;
 
 import android.annotation.SuppressLint;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.navigation.Navigation;
-import androidx.recyclerview.widget.RecyclerView;
 
 import com.jcodecraeer.xrecyclerview.XRecyclerView;
 
 import org.jetbrains.annotations.NotNull;
-
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Random;
 
 
 public class NewsListAdapter extends XRecyclerView.Adapter<NewsListAdapter.NewsListViewHolder>{
     List<NewsEntity> newslist;
+    Random rand = new Random();
+    private static int[] pics = new int[]{
+            R.drawable.random1,
+            R.drawable.random2,
+            R.drawable.random3,
+            R.drawable.random4,
+            R.drawable.random5,
+            R.drawable.random6,
+            R.drawable.random7};
+    private static int length = pics.length;
 
     static public class NewsListViewHolder extends XRecyclerView.ViewHolder {
         public View layout;
@@ -48,7 +57,7 @@ public class NewsListAdapter extends XRecyclerView.Adapter<NewsListAdapter.NewsL
         String title = news.getmTitle();
         if(title.length() > 40) title = title.substring(0, 40) + "...";
         newsTextView.setText(title);
-        newsSourceView.setText(news.getTime() + " " + news.getmSource());
+        newsSourceView.setText(news.getTime() + " 来源:" + news.getmSource());
         if (news.viewed) {
             newsTextView.setTextColor(0xffaaaaaa);
         } else {
@@ -60,6 +69,7 @@ public class NewsListAdapter extends XRecyclerView.Adapter<NewsListAdapter.NewsL
             Navigation.findNavController(v).navigate(R.id.action_view_news_body, bundle);
             Updater.logViewed(news);
         });
+        ((ImageView)holder.layout.findViewById(R.id.news_img)).setImageResource(pics[rand.nextInt(length)]);
     }
     @Override
     public int getItemCount() { return newslist.size(); }

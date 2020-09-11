@@ -2,17 +2,22 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:id="@+id/main_item_first"
         android:title="疫情新闻"
+        android:icon="@drawable/news_hot_fill"
         android:onClick="main_drawer_button_click"/>
     <item android:id="@+id/main_item_second"
         android:title="疫情数据"
+        android:icon="@drawable/bar_red"
         android:onClick="main_drawer_button_click"/>
     <item android:id="@+id/main_item_third"
         android:title="疫情图谱"
+        android:icon="@drawable/graph_red"
         android:onClick="main_drawer_button_click"/>
     <item android:id="@+id/main_item_fourth"
         android:title="事件聚类"
+        android:icon="@drawable/cluster_red"
         android:onClick="main_drawer_button_click"/>
     <item android:id="@+id/main_item_fifth"
         android:title="知疫学者"
+        android:icon="@drawable/group_fill_red"
         android:onClick="main_drawer_button_click"/>
 </menu>

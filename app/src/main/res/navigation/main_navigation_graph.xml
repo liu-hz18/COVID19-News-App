@@ -74,5 +74,10 @@
             app:argType="com.example.newsapp.ExpertEntity" />
     </fragment>
 
-
+    <fragment
+        android:id="@+id/clustering_main_fragment"
+        android:name="com.example.newsapp.main_clustering_fragment"
+        android:label="fragment_clustering_main_fragment"
+        tools:layout="@layout/clustering_main_fragment" >
+    </fragment>
 </navigation>

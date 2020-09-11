@@ -11,7 +11,6 @@ import org.litepal.crud.LitePalSupport;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -67,6 +66,10 @@ public class SearchEngine {
         //计算tf
         for(NewsEntity newsFile: newsList) {
             List<String> tokens = newsFile.getmTokens();
+            List<String> titletokens = tokenize(newsFile.getmTitle());
+            tokens.addAll(titletokens);
+            tokens.addAll(titletokens);
+            tokens.addAll(titletokens);
             Map<String, Long> countMap = tokens.parallelStream().collect(
                     Collectors.groupingBy(String::toString, Collectors.counting()));
             tfTable.put(newsFile.getmEventId(), countMap);

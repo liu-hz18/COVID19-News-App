@@ -38,6 +38,7 @@
             android:text="TextView"
             android:textColor="#A1A1A1"
             android:textSize="11sp"
+            android:typeface="serif"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent" />
 

@@ -15,13 +15,15 @@
             android:id="@+id/news_list_recyclerview"
             android:layout_width="0dp"
             android:layout_height="0dp"
+            android:scrollbars="vertical"
             app:layout_constraintBottom_toTopOf="@+id/history_tab_layout"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/news_tab_layout"
             app:layout_constraintVertical_bias="1.0"
-            tools:ignore="UnknownId" />
+            tools:ignore="UnknownId"
+            android:background="@color/tableBgColor"/>
 
         <TextView
             android:id="@+id/news_list_search_edittext"
@@ -33,12 +35,13 @@
             android:ems="10"
             android:textColor="#604033"
             android:textSize="16sp"
-            android:text="  请输入搜索内容"
+            android:text="  Type and enjoy searching"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            android:autofillHints="" />
+            android:autofillHints=""
+            android:drawableStart="@drawable/search_red"/>
 
         <com.google.android.material.tabs.TabLayout
            android:id="@+id/news_tab_layout"
@@ -61,12 +64,14 @@
             <com.google.android.material.tabs.TabItem
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:icon="@mipmap/cat_list" />
+                android:icon="@drawable/news"
+                android:text="最新新闻"/>
 
             <com.google.android.material.tabs.TabItem
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:icon="@mipmap/copy" />
+                android:icon="@drawable/history"
+                android:text="浏览记录"/>
 
         </com.google.android.material.tabs.TabLayout>
 

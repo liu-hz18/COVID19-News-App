@@ -11,25 +11,27 @@
         android:layout_height="match_parent"
         tools:context=".MainActivity">
 
+        <com.google.android.material.tabs.TabLayout
+            android:id="@+id/news_tab_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintBottom_toTopOf="@+id/expert_list_recyclerview"
+            app:tabMaxWidth="0dp" />
+
         <com.jcodecraeer.xrecyclerview.XRecyclerView
             android:id="@+id/expert_list_recyclerview"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
+            android:layout_width="match_parent"
+            android:layout_height="505dp"
+            android:scrollbars="vertical"
             app:layout_constraintBottom_toTopOf="@+id/alive_tab_layout"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/news_tab_layout"
-            app:layout_constraintVertical_bias="1.0" />
-
-        <com.google.android.material.tabs.TabLayout
-            android:id="@+id/news_tab_layout"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:tabMaxWidth="0dp"
-            tools:ignore="MissingConstraints" />
+            app:layout_constraintTop_toBottomOf="parent"
+            app:layout_constraintVertical_bias="1.0"
+            android:background="@color/tableBgColor"/>
 
         <com.google.android.material.tabs.TabLayout
             android:id="@+id/alive_tab_layout"

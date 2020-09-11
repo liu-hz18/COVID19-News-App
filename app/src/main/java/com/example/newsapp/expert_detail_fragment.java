@@ -34,10 +34,10 @@ public class expert_detail_fragment extends Fragment {
         } else {
             ((TextView)ret_view.findViewById(R.id.expert_body_name)).setText(zhName + " " + enName);
         }
-        ((TextView)ret_view.findViewById(R.id.expert_body_content)).setText("职位: " +  expert.mPosition);
-        ((TextView)ret_view.findViewById(R.id.expert_body_date)).setText("单位: " + expert.mAssociation);
-        if(expert.mHomePage != null)((TextView)ret_view.findViewById(R.id.expert_body_url)).setText("主页: " + expert.mHomePage);
-        ((TextView)ret_view.findViewById(R.id.expert_body_source)).setText("\n基本情况: " + expert.mBasicIntro + "\n\n教育经历: " + expert.mEduIntro);
+        ((TextView)ret_view.findViewById(R.id.expert_body_content)).setText(expert.mPosition);
+        ((TextView)ret_view.findViewById(R.id.expert_body_date)).setText(expert.mAssociation.replace("/null", ""));
+        if(expert.mHomePage != null)((TextView)ret_view.findViewById(R.id.expert_body_url)).setText(expert.mHomePage);
+        ((TextView)ret_view.findViewById(R.id.expert_body_source)).setText("\n\n\n基本情况:\n" + expert.mBasicIntro + "\n\n教育经历:\n " + expert.mEduIntro);
         if(expert.mImgURL != null) {
             ImageView expertImageView = ret_view.findViewById(R.id.expert_body_image);
             Glide.with(ret_view.getContext()).load(expert.mImgURL).into(expertImageView);

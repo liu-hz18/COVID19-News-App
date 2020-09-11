@@ -14,12 +14,14 @@ import androidx.navigation.Navigation;
 import org.jetbrains.annotations.NotNull;
 
 public class MainActivity extends AppCompatActivity {
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Toolbar toolbar = findViewById(R.id.main_toolbar);
         setSupportActionBar(toolbar);
+        getSupportActionBar().setHomeAsUpIndicator(R.drawable.more_small);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
 
@@ -53,6 +55,8 @@ public class MainActivity extends AppCompatActivity {
                 ((DrawerLayout) findViewById(R.id.main_drawerlayout)).closeDrawers();
                 return true;
             case R.id.main_item_fourth:
+                Navigation.findNavController(findViewById((R.id.main_fragment_host))).navigate(R.id.clustering_main_fragment);
+                ((DrawerLayout) findViewById(R.id.main_drawerlayout)).closeDrawers();
                 return true;
             case R.id.main_item_fifth:
                 Navigation.findNavController(findViewById((R.id.main_fragment_host))).navigate(R.id.expert_main_fragment);

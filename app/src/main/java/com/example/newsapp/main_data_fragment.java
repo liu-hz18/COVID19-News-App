@@ -151,6 +151,7 @@ public class main_data_fragment extends Fragment {
         BarDataSet barDataSet = new BarDataSet(Values, "各国死亡人数");
         barDataSet.setColor(Color.parseColor(color[0]));
         barDataSet.setDrawValues(true);
+        barDataSet.setValueTextSize(12f);
         sets.add(barDataSet);
         return new BarData(sets);
     }
@@ -192,6 +193,7 @@ public class main_data_fragment extends Fragment {
         yAxis_left.setValueFormatter(new LargeValueFormatter());
         BarDataSet barDataSet = new BarDataSet(Values, "各国确诊人数");
         barDataSet.setDrawValues(true);
+        barDataSet.setValueTextSize(12f);
         barDataSet.setColor(Color.parseColor(color[1]));
         sets.add(barDataSet);
         return new BarData(sets);
@@ -234,6 +236,7 @@ public class main_data_fragment extends Fragment {
         yAxis_left.setValueFormatter(new LargeValueFormatter());
         BarDataSet barDataSet = new BarDataSet(Values, "各国治愈人数");
         barDataSet.setDrawValues(true);
+        barDataSet.setValueTextSize(12f);
         barDataSet.setColor(Color.parseColor(color[2]));
         sets.add(barDataSet);
         return new BarData(sets);
@@ -276,6 +279,7 @@ public class main_data_fragment extends Fragment {
         yAxis_left.setValueFormatter(new LargeValueFormatter());
         BarDataSet barDataSet = new BarDataSet(Values, "各国疑似人数");
         barDataSet.setDrawValues(true);
+        barDataSet.setValueTextSize(12f);
         barDataSet.setColor(Color.parseColor(color[3]));
         sets.add(barDataSet);
         return new BarData(sets);
@@ -321,6 +325,7 @@ public class main_data_fragment extends Fragment {
 
         BarDataSet barDataSet = new BarDataSet(Values, "中国各省死亡人数");
         barDataSet.setDrawValues(true);
+        barDataSet.setValueTextSize(12f);
         barDataSet.setColor(Color.parseColor(color[6]));
         sets.add(barDataSet);
         return new BarData(sets);
@@ -365,6 +370,7 @@ public class main_data_fragment extends Fragment {
 
         BarDataSet barDataSet = new BarDataSet(Values, "中国各省确诊人数");
         barDataSet.setDrawValues(true);
+        barDataSet.setValueTextSize(12f);
         barDataSet.setColor(Color.parseColor(color[7]));
         sets.add(barDataSet);
         return new BarData(sets);
@@ -410,6 +416,7 @@ public class main_data_fragment extends Fragment {
 
         BarDataSet barDataSet = new BarDataSet(Values, "中国各省治愈人数");
         barDataSet.setDrawValues(true);
+        barDataSet.setValueTextSize(12f);
         barDataSet.setColor(Color.parseColor(color[8]));
         sets.add(barDataSet);
         return new BarData(sets);
@@ -457,6 +464,7 @@ public class main_data_fragment extends Fragment {
 
         BarDataSet barDataSet = new BarDataSet(Values, "中国各省疑似人数");
         barDataSet.setDrawValues(true);
+        barDataSet.setValueTextSize(12f);
         barDataSet.setColor(Color.parseColor(color[9]));
         sets.add(barDataSet);
         return new BarData(sets);

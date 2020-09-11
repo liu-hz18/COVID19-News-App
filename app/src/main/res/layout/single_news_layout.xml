@@ -2,57 +2,55 @@
 
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_height="wrap_content"
     android:layout_width="match_parent"
-    android:layout_marginVertical="7dp"
-    android:layout_marginHorizontal="7dp"
+    android:layout_marginVertical="3dp"
+    android:layout_marginHorizontal="5dp"
     app:cardBackgroundColor="@color/cardBgColor"
-    app:cardElevation="3dp"
-    app:cardCornerRadius="0dp">
+    app:cardElevation="10dp"
+    app:cardCornerRadius="5dp">
 <androidx.constraintlayout.widget.ConstraintLayout
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
     <TextView
         android:id="@+id/news_title"
-        android:layout_width="222dp"
-        android:layout_height="101dp"
-        android:layout_marginStart="12dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="12dp"
+        android:layout_width="150dp"
+        android:layout_height="89dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="2dp"
         android:clickable="true"
         android:textColor="#000000"
-        android:textSize="20sp"
         android:textStyle="bold"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
+        android:textSize="18sp"
+        app:layout_constraintEnd_toStartOf="@+id/news_img"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/news_source"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="12dp"
-        android:layout_marginBottom="12dp"
-        android:text="TextView"
+        android:layout_width="162dp"
+        android:layout_height="19dp"
+        android:layout_marginBottom="8dp"
+        android:autoSizeTextType="uniform"
         android:textColor="#A1A1A1"
-        android:textSize="12sp"
+        android:typeface="serif"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/news_img"
         app:layout_constraintStart_toStartOf="parent" />
 
     <ImageView
-        android:id="@+id/imageView3"
+        android:id="@+id/news_img"
         android:layout_width="145dp"
         android:layout_height="123dp"
         android:layout_marginStart="10dp"
         android:layout_marginBottom="10dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.939"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/news_title"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="1.0"
         app:srcCompat="@mipmap/ic_launcher" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

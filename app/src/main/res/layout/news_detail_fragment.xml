@@ -19,9 +19,14 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="30dp"
         android:layout_marginEnd="30dp"
+        android:layout_marginTop="8dp"
         android:text="@string/blank_news_detail"
+        android:gravity="center_horizontal|center_vertical"
+        android:lineSpacingExtra="8sp"
+        android:textAlignment="center"
+        android:fontFamily="sans-serif-black"
         android:textColor="@color/design_default_color_on_secondary"
-        android:textSize="40sp"
+        android:textSize="28sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -34,9 +39,9 @@
         android:layout_marginStart="20dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="20dp"
-        android:text="@string/blank_news_detail"
         android:textColor="@color/pagePublisherColor"
-        android:textSize="20sp"
+        android:textSize="16sp"
+        android:typeface="serif"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/news_body_title" />
@@ -47,8 +52,8 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
         android:layout_marginEnd="20dp"
-        android:text="@string/blank_news_detail"
-        android:textSize="20sp"
+        android:textSize="16sp"
+        android:typeface="serif"
         android:textColor="@color/pagePublisherColor"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -56,18 +61,60 @@
 
     <TextView
         android:id="@+id/news_body_content"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="12dp"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginStart="20dp"
         android:layout_marginTop="32dp"
-        android:layout_marginEnd="12dp"
+        android:layout_marginEnd="20dp"
+        android:lineSpacingExtra="8sp"
+        android:typeface="serif"
         android:text="@string/blank_news_detail"
         android:textColor="@color/pageContentColor"
-        android:textSize="30sp"
+        android:textSize="18sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.483"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/news_body_date" />
+        app:layout_constraintTop_toBottomOf="@+id/news_body_date"
+        app:layout_constraintBottom_toTopOf="@+id/share_tab_layout"/>
+
+<!--    <Button-->
+<!--        android:id="@+id/button_share"-->
+<!--        android:layout_width="63dp"-->
+<!--        android:layout_height="55dp"-->
+<!--        android:layout_marginStart="16dp"-->
+<!--        android:layout_marginTop="12dp"-->
+<!--        android:background="@android:color/transparent"-->
+<!--        android:drawableBottom=""-->
+<!--        app:layout_constraintStart_toStartOf="parent"-->
+<!--        app:layout_constraintTop_toBottomOf="@+id/news_body_content" />-->
+
+    <com.google.android.material.tabs.TabLayout
+        android:id="@+id/share_tab_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+    <com.google.android.material.tabs.TabItem
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:icon="@drawable/qq_"
+        android:text="QQ分享"/>
+
+    <com.google.android.material.tabs.TabItem
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:icon="@drawable/weibo_share"
+        android:text="微博分享"/>
+
+        <com.google.android.material.tabs.TabItem
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:icon="@drawable/wechat_share"
+            android:text="微信分享"/>
+    </com.google.android.material.tabs.TabLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
-    </ScrollView>
+</ScrollView>

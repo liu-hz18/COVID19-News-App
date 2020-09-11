@@ -17,6 +17,7 @@
     <!--android:hardwareAccelerated="false"-->
     <application
         android:name=".NewsApplication"
+        tools:replace="android:name"
         android:allowBackup="true"
         android:largeHeap="true"
         android:hardwareAccelerated="false"

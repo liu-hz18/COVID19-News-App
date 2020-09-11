@@ -1,6 +1,5 @@
 package com.example.newsapp;
 import android.annotation.SuppressLint;
-import android.graphics.Color;
 import android.os.Bundle;
 
 import android.animation.Animator;
@@ -15,10 +14,10 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 
 import android.os.Handler;
 import android.os.Message;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -73,7 +72,6 @@ public class main_news_fragment extends Fragment {
     private String news_type = "all";
 
     private boolean view_history = false;
-    static boolean searching = false;
 
     private XRecyclerView mRecyclerView;
     private TextView searchTextView;
@@ -182,7 +180,7 @@ public class main_news_fragment extends Fragment {
         tablayout.addTab(temp_tab);
         linearLayout = temp_tab.view;
         layoutParams = (LinearLayout.LayoutParams) linearLayout.getLayoutParams();
-        layoutParams.width = 100;
+        layoutParams.width = 200;
         linearLayout.setLayoutParams(layoutParams);
         tablayout.getTabAt(newsClass).select();
         tablayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
@@ -194,26 +192,27 @@ public class main_news_fragment extends Fragment {
                 ((TabLayout)ret_view.findViewById(R.id.history_tab_layout)).getTabAt(0).select();
                 CharSequence text = tab.getText();
                 pre_tab = text.toString();
+                Log.d("addOnTabSelectedListener", String.valueOf(NewsApplication.searching));
                 if ("全部".contentEquals(text)) {
                     newsClass = ALL;
                     news_type = "all";
-                    searching = false;
+                    NewsApplication.searching = false;
                     view_history = false;
                     changeType(news_type);
                 } else if ("新闻".contentEquals(text)) {
                     newsClass = NEWS;
                     news_type = "news";
-                    searching = false;
+                    NewsApplication.searching = false;
                     view_history = false;
                     changeType(news_type);
                 } else if ("论文".contentEquals(text)) {
                     newsClass = PAPER;
                     news_type = "paper";
-                    searching = false;
+                    NewsApplication.searching = false;
                     view_history = false;
                     changeType(news_type);
                 } else if ("+".contentEquals(text)) {
-                    searching = false;
+                    NewsApplication.searching = false;
                     view_history = false;
                     NewsClassDialog dialog = new NewsClassDialog();
                     dialog.show(getActivity().getSupportFragmentManager(), "choose_class_dialog");
@@ -231,10 +230,13 @@ public class main_news_fragment extends Fragment {
 
     private void onCreateRecyclerView(View ret_view) {
         mRecyclerView = ret_view.findViewById(R.id.news_list_recyclerview);
-        mRecyclerView.setLoadingMoreProgressStyle(ProgressStyle.BallPulse);
+        //mRecyclerView.setLoadingMoreProgressStyle(ProgressStyle.BallPulse);
         LinearLayoutManager layoutManager = new LinearLayoutManager( getActivity());
         mRecyclerView.setLayoutManager(layoutManager);
+        mRecyclerView.setLoadingMoreEnabled(true);
+        mRecyclerView.setPullRefreshEnabled(true);
         mRecyclerView.getDefaultRefreshHeaderView().setRefreshTimeVisible(true);
+        mRecyclerView.getDefaultFootView().setLoadingDoneHint("加载完成");
         adapter = new NewsListAdapter();
         mRecyclerView.setAdapter(adapter);
 
@@ -242,25 +244,26 @@ public class main_news_fragment extends Fragment {
         NewsUpdater.setHandler(mhandler);
 
         if(view_history) refresh_history();
-        else refresh_callback();
+        else if(!NewsApplication.searching) refresh_callback();
         mRecyclerView.setLoadingListener(new XRecyclerView.LoadingListener() {
             @Override
             public void onRefresh() {
-                if(!view_history && !searching) {
-                    Updater.updatePullUpNews(news_type);
-                }
                 new Handler().postDelayed(() -> {
+                    Log.d("setLoadingListener", String.valueOf(NewsApplication.searching));
+                    if(!view_history && !NewsApplication.searching) {
+                        Updater.updatePullUpNews(news_type);
+                    }
                     mRecyclerView.refreshComplete();
                 }, 600);
             }
 
             @Override
             public void onLoadMore() {
-                if(!view_history && !searching) {
-                    Updater.updatePullDownNews(news_type);
-                }
                 new Handler().postDelayed(() -> {
-                    mRecyclerView.refreshComplete();
+                    if(!view_history && !NewsApplication.searching) {
+                        Updater.updatePullDownNews(news_type);
+                    }
+                    mRecyclerView.loadMoreComplete();
                 }, 600);
             }
         });
