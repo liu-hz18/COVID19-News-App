@@ -93,7 +93,7 @@ class Updater {
 
     public static void logViewed(NewsEntity news) {
         Thread newsTask = new Thread(() -> {
-            viewedNews.add(news);
+            if(!news.viewed) viewedNews.add(news);
             news.viewed = true;
             System.gc();
         });

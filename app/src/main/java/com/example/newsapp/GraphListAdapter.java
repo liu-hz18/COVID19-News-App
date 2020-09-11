@@ -1,7 +1,10 @@
 package com.example.newsapp;
 
 import android.annotation.SuppressLint;
+import android.graphics.Typeface;
+import android.os.Build;
 import android.os.Handler;
+import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -31,7 +34,7 @@ public class GraphListAdapter extends BaseExpandableListAdapter {
     @Override
     public int getChildrenCount(int groupPosition) {
         SearchEntity group_father = group_list.get(groupPosition);
-        return group_father.getmRelationList().size() + group_father.getmPropertyMap().size();
+        return group_father.getmRelationList().size() + group_father.getmPropertyMap().size() + 1;
     }
 
     @Override
@@ -40,10 +43,13 @@ public class GraphListAdapter extends BaseExpandableListAdapter {
     @Override
     public Object getChild(int groupPosition, int childPosition) {
         SearchEntity group_father = group_list.get(groupPosition);
-        if(childPosition < group_father.getmRelationList().size()) {
-            return group_father.getmRelationList().get(childPosition);
+        int size = 1 + group_father.getmPropertyMap().size();
+        if(childPosition == 0) {
+            return group_father.mIntroduction;
+        } else if ( childPosition > 0 && childPosition < size) {
+            return group_father.getmPropertyMap().get(childPosition-1);
         } else {
-            return group_father.getmPropertyMap().get(childPosition);
+            return group_father.getmRelationList().get(childPosition-size);
         }
     }
 
@@ -62,8 +68,8 @@ public class GraphListAdapter extends BaseExpandableListAdapter {
         SearchEntity entity = (SearchEntity)getGroup(groupPosition);
         TextView label = view.findViewById(R.id.graph_content);
         label.setText(entity.mLabel);
-        TextView text = view.findViewById(R.id.entry_text);
-        text.setText(entity.mIntroduction);
+        //TextView text = view.findViewById(R.id.entry_text);
+        //text.setText(entity.mIntroduction);
         if(entity.mImageURL != null) {
             ImageView imgView = view.findViewById(R.id.entry_image);
             Glide.with(viewGroup.getContext()).load(entity.mImageURL).into(imgView);
@@ -78,24 +84,27 @@ public class GraphListAdapter extends BaseExpandableListAdapter {
         TextView entityRelationView = cardView.findViewById(R.id.entity_relation);
         TextView entityLabelView = cardView.findViewById(R.id.entity_label);
         ImageView imageView = cardView.findViewById(R.id.entity_image);
-        TextView entityURLView = cardView.findViewById(R.id.entity_url);
 
         SearchEntity group_father = group_list.get(groupPosition);
-        int size = group_father.getmRelationList().size();
-        if(childPosition < size) {
-            RelationEntity relationentity = group_father.getmRelationList().get(childPosition);
+        int size = group_father.getmPropertyMap().size() + 1;
+        if(childPosition == 0) {
+            entityRelationView.getLayoutParams().width = 1000;
+            entityLabelView.setTypeface(Typeface.defaultFromStyle(Typeface.NORMAL));
+            entityLabelView.setAutoSizeTextTypeWithDefaults(TextView.AUTO_SIZE_TEXT_TYPE_UNIFORM);
+            entityRelationView.setText(group_father.mIntroduction);
+        } else if (childPosition > 0 && childPosition < size) {
+            Property property = group_father.getmPropertyMap().get(childPosition - 1);
+            entityRelationView.setText(property.name);
+            entityLabelView.setText(property.intro);
+            imageView.setImageResource(R.mipmap.right_arrow_little);
+        } else {
+            RelationEntity relationentity = group_father.getmRelationList().get(childPosition - size);
             entityRelationView.setText(relationentity.mRelation);
-            entityLabelView.setText(relationentity.mLabel);
-            entityURLView.setText("link: " + relationentity.mRelationURL);
+            entityLabelView.setText(Html.fromHtml("<a href='" + relationentity.mRelationURL + "'>"  + relationentity.mLabel + "</a>", Build.VERSION.SDK_INT));
             if(relationentity.isForward)
                 imageView.setImageResource(R.drawable.right_arrow);
             else
                 imageView.setImageResource(R.drawable.left_arrow);
-        } else {
-            Property property = group_father.getmPropertyMap().get(childPosition - size);
-            entityRelationView.setText(property.name);
-            entityLabelView.setText(property.intro);
-            imageView.setImageResource(R.mipmap.right_arrow_little);
         }
         return cardView;
     }

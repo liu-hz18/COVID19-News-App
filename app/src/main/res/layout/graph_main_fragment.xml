@@ -2,12 +2,12 @@
 
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".graph_main_fragment"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:layout_marginBottom="20dp">
 
     <SearchView
         android:id="@+id/search_graph_view"
@@ -21,6 +21,9 @@
         android:layout_width="match_parent"
         android:layout_height="675dp"
         android:layout_gravity="bottom"
-        android:scrollbars="vertical"/>
+        android:scrollbars="vertical"
+        />
 
 </LinearLayout >
+
+

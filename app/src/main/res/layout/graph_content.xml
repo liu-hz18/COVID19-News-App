@@ -11,47 +11,39 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="459dp"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:background="@color/cardBgColor">
 
         <TextView
             android:id="@+id/graph_content"
-            android:layout_width="221dp"
-            android:layout_height="74dp"
+            android:layout_width="218dp"
+            android:layout_height="53dp"
             android:layout_marginStart="12dp"
             android:layout_marginTop="8dp"
             android:layout_marginEnd="12dp"
             android:clickable="true"
-            android:text="TextView"
+            android:gravity="center_horizontal|center_vertical"
+            android:lineSpacingExtra="8sp"
+            android:textAlignment="center"
             android:textColor="#000000"
-            android:textSize="20sp"
+            android:textSize="16sp"
             android:textStyle="bold"
+            android:typeface="serif"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <TextView
-            android:id="@+id/entry_text"
-            android:layout_width="229dp"
-            android:layout_height="48dp"
-            android:layout_marginStart="12dp"
-            android:text="TextView"
-            android:textColor="#A1A1A1"
-            android:textSize="11sp"
-            android:typeface="serif"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
-
         <ImageView
             android:id="@+id/entry_image"
-            android:layout_width="145dp"
-            android:layout_height="123dp"
-            android:layout_marginStart="10dp"
-            android:layout_marginBottom="10dp"
+            android:layout_width="67dp"
+            android:layout_height="57dp"
+            android:layout_marginStart="3dp"
+            android:layout_marginBottom="3dp"
             android:contentDescription="TODO"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.775"
+            app:layout_constraintHorizontal_bias="0.604"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_bias="1.0" />
